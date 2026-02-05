@@ -1,4 +1,4 @@
-# GitBuddy (gib) — Documentation
+# GitBro (gib) — Documentation
 
   
 
@@ -16,7 +16,7 @@ Manage multiple Git identities via SSH so you can use personal and work GitHub a
 
 ```bash
 
-npm  install  -g  gitbuddy
+npm  install  -g  gitbro
 
 ```
 
@@ -34,7 +34,7 @@ Requires **Node.js 18+**.
 
   
 
-1.  **Initialize** (creates `~/.gitbuddy/config.json`, detects existing config):
+1.  **Initialize** (creates `~/.gitbro/config.json`, detects existing config):
 
   
 
@@ -110,7 +110,7 @@ gib status
 
   
 
-**What it does:** One-time interactive setup. If you don’t have config yet, it walks you through creating your first identity (ID, name, email, SSH key path, SSH host alias). It then creates `~/.gitbuddy/config.json`, writes per-identity Git configs, updates `~/.gitconfig` with `includeIf` rules, and optionally updates `~/.ssh/config` with Host blocks.
+**What it does:** One-time interactive setup. If you don’t have config yet, it walks you through creating your first identity (ID, name, email, SSH key path, SSH host alias). It then creates `~/.gitbro/config.json`, writes per-identity Git configs, updates `~/.gitconfig` with `includeIf` rules, and optionally updates `~/.ssh/config` with Host blocks.
 
   
 
@@ -160,11 +160,11 @@ gib  status
 
   
 
-**What it does:** Writes the **current** state of `~/.gitbuddy/config.json` out to the system: updates `~/.ssh/config` (Host blocks for each identity), writes identity gitconfigs under `~/.gitbuddy/gitconfigs`, and refreshes `~/.gitconfig` includeIf rules. It will prompt before modifying `~/.ssh/config`.
+**What it does:** Writes the **current** state of `~/.gitbro/config.json` out to the system: updates `~/.ssh/config` (Host blocks for each identity), writes identity gitconfigs under `~/.gitbro/gitconfigs`, and refreshes `~/.gitconfig` includeIf rules. It will prompt before modifying `~/.ssh/config`.
 
   
 
-**When to use:** After you’ve added/edited identities or directory mappings (e.g. via `gib identity add`, `gib dir add`, or by editing the JSON) and want those changes to take effect. Also useful if you manually changed `~/.ssh/config` or `~/.gitconfig` and want to re-sync from GitBuddy.
+**When to use:** After you’ve added/edited identities or directory mappings (e.g. via `gib identity add`, `gib dir add`, or by editing the JSON) and want those changes to take effect. Also useful if you manually changed `~/.ssh/config` or `~/.gitconfig` and want to re-sync from GitBro.
 
   
 
@@ -319,7 +319,7 @@ gib  dir  add  .  --identity  work
 
   
 
-**What it does:** Removes the directory mapping for the given path. The path is resolved the same way as for `dir add` (e.g. `~` expanded). Repos under that path will no longer auto-use an identity from GitBuddy until you add a mapping again.
+**What it does:** Removes the directory mapping for the given path. The path is resolved the same way as for `dir add` (e.g. `~` expanded). Repos under that path will no longer auto-use an identity from GitBro until you add a mapping again.
 
   
 
@@ -476,7 +476,7 @@ gib  status
 
   
 
--  **GitBuddy config:**  `~/.gitbuddy/config.json` (identities, SSH key paths, directory mappings).
+-  **GitBro config:**  `~/.gitbro/config.json` (identities, SSH key paths, directory mappings).
 
 -  **Git:**  `~/.gitconfig` gets `includeIf` directives when you run `gib init`, `gib identity add`, `gib dir add`, or `gib apply`.
 

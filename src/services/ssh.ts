@@ -2,7 +2,7 @@ import fs from 'fs-extra';
 import path from 'path';
 import { spawn } from 'child_process';
 import { resolveHome, getConfigPath } from './config.js';
-import { DEFAULT_SSH_DIR, GITBUDDY_SSH_CONFIG_MARKER } from '../types/index.js';
+import { DEFAULT_SSH_DIR, GITBRO_SSH_CONFIG_MARKER } from '../types/index.js';
 
 const SSH_DIR = resolveHome(DEFAULT_SSH_DIR);
 const SSH_CONFIG_PATH = path.join(SSH_DIR, 'config');
@@ -25,7 +25,7 @@ export async function generateKey(identityId: string): Promise<string> {
   if (!SAFE_ID_REGEX.test(identityId)) {
     throw new Error('Identity ID must contain only letters, numbers, underscore, and hyphen');
   }
-  const keyPath = path.join(SSH_DIR, `gitbuddy_${identityId}`);
+  const keyPath = path.join(SSH_DIR, `gitbro_${identityId}`);
   assertPathUnderBase(path.resolve(keyPath), SSH_DIR, 'SSH key path');
   if (await fs.pathExists(keyPath)) {
     throw new Error(`SSH key already exists at ${keyPath}`);
@@ -35,7 +35,7 @@ export async function generateKey(identityId: string): Promise<string> {
   return new Promise((resolve, reject) => {
     const proc = spawn(
       'ssh-keygen',
-      ['-t', 'ed25519', '-f', keyPath, '-N', '', '-C', `gitbuddy-${identityId}`],
+      ['-t', 'ed25519', '-f', keyPath, '-N', '', '-C', `gitbro-${identityId}`],
       { stdio: ['inherit', 'pipe', 'pipe'] }
     );
     let stderr = '';
@@ -87,7 +87,7 @@ export async function readSshConfig(): Promise<string> {
   return fs.readFile(SSH_CONFIG_PATH, 'utf-8');
 }
 
-function extractGitBuddyBlocks(content: string): { before: string; after: string } {
+function extractGitBroBlocks(content: string): { before: string; after: string } {
   const lines = content.split('\n');
   let inBlock = false;
   let seenHostInBlock = false;
@@ -96,7 +96,7 @@ function extractGitBuddyBlocks(content: string): { before: string; after: string
   let target = before;
 
   for (const line of lines) {
-    if (line.trim().startsWith(GITBUDDY_SSH_CONFIG_MARKER)) {
+    if (line.trim().startsWith(GITBRO_SSH_CONFIG_MARKER)) {
       inBlock = true;
       seenHostInBlock = false;
       target = after;
@@ -136,11 +136,11 @@ function sanitizeSshHost(host: string): string {
   return host.replace(/[\r\n"]/g, '').trim();
 }
 
-function buildGitBuddyBlock(sshHost: string, identityFile: string): string {
+function buildGitBroBlock(sshHost: string, identityFile: string): string {
   const safeHost = sanitizeSshHost(sshHost);
   const normalizedPath = identityFile.startsWith('/') ? identityFile : path.resolve(identityFile);
   return [
-    `${GITBUDDY_SSH_CONFIG_MARKER} ${safeHost}`,
+    `${GITBRO_SSH_CONFIG_MARKER} ${safeHost}`,
     `Host ${safeHost}`,
     '    HostName github.com',
     '    User git',
@@ -152,8 +152,8 @@ function buildGitBuddyBlock(sshHost: string, identityFile: string): string {
 
 export async function writeSshConfigBlocks(blocks: { sshHost: string; identityFile: string }[]): Promise<void> {
   const content = await readSshConfig();
-  const { before, after } = extractGitBuddyBlocks(content);
-  const newBlocks = blocks.map((b) => buildGitBuddyBlock(b.sshHost, b.identityFile)).join('\n');
+  const { before, after } = extractGitBroBlocks(content);
+  const newBlocks = blocks.map((b) => buildGitBroBlock(b.sshHost, b.identityFile)).join('\n');
   const parts = [before, newBlocks, after].filter(Boolean);
   const out = parts.join('\n\n') + (parts[parts.length - 1]?.endsWith('\n') ? '' : '\n');
   await fs.ensureDir(path.dirname(SSH_CONFIG_PATH));

@@ -13,7 +13,7 @@ export async function runInit(): Promise<void> {
     const config = await readConfig();
     if (config && config.identities.length > 0) {
       section('Existing configuration');
-      info(`Found ${config.identities.length} identity/identities in ~/.gitbuddy/config.json`);
+      info(`Found ${config.identities.length} identity/identities in ~/.gitbro/config.json`);
       console.log('');
       const { apply } = await inquirer.prompt<{ apply: boolean }>({
         type: 'confirm',
@@ -31,7 +31,7 @@ export async function runInit(): Promise<void> {
           );
         }
         await withSpinner(
-          'Writing identity gitconfigs to ~/.gitbuddy/gitconfigs',
+          'Writing identity gitconfigs to ~/.gitbro/gitconfigs',
           () => syncAllIdentityGitconfigs(config.identities),
           { successMessage: 'Git config files written', failureMessage: 'Failed to write git configs' }
         );
@@ -48,7 +48,7 @@ export async function runInit(): Promise<void> {
   }
 
   section('Set up your first identity');
-  info('We\'ll create one identity (name, email, SSH key) and save it to ~/.gitbuddy.');
+  info('We\'ll create one identity (name, email, SSH key) and save it to ~/.gitbro.');
   console.log('');
 
   const fields = await promptIdentityFields();
@@ -63,7 +63,7 @@ export async function runInit(): Promise<void> {
   };
 
   await withSpinner(
-    'Saving config to ~/.gitbuddy/config.json',
+    'Saving config to ~/.gitbro/config.json',
     () => writeConfig({ identities: [identity], defaultIdentity: identity.id }),
     { successMessage: 'Config saved', failureMessage: 'Failed to save config' }
   );

@@ -23,8 +23,8 @@ export const ConfigSchema = z.object({
 
 export type Config = z.infer<typeof ConfigSchema>;
 
-export const DEFAULT_CONFIG_PATH = '~/.gitbuddy/config.json';
-export const DEFAULT_GITBUDDY_DIR = '~/.gitbuddy';
-export const DEFAULT_GITCONFIGS_DIR = '~/.gitbuddy/gitconfigs';
+export const DEFAULT_CONFIG_PATH = '~/.gitbro/config.json';
+export const DEFAULT_GITBRO_DIR = '~/.gitbro';
+export const DEFAULT_GITCONFIGS_DIR = '~/.gitbro/gitconfigs';
 export const DEFAULT_SSH_DIR = '~/.ssh';
-export const GITBUDDY_SSH_CONFIG_MARKER = '# GitBuddy:';
+export const GITBRO_SSH_CONFIG_MARKER = '# GitBro:';

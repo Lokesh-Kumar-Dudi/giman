@@ -23,7 +23,7 @@ export function registerDirectoryCommands(program: Command): void {
     .action(async (pathArg: string, opts: { identity: string }) => {
       const config = await readConfig();
       if (!config) {
-        failure('No config found', 'Run gib init first to create ~/.gitbuddy/config.json');
+        failure('No config found', 'Run gib init first to create ~/.gitbro/config.json');
         process.exit(1);
       }
       const normalized = resolveHome(pathArg);

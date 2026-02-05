@@ -18,7 +18,7 @@ function assertPathUnderBase(resolvedPath: string, baseDir: string): void {
   }
 }
 const GITCONFIG_PATH = path.join(os.homedir(), '.gitconfig');
-const GITBUDDY_INCLUDE_MARKER = '# GitBuddy includeIf';
+const GITBRO_INCLUDE_MARKER = '# GitBro includeIf';
 
 /** Escape a value for git config to prevent section/key injection (newlines, "[", etc.). */
 function escapeGitConfigValue(value: string): string {
@@ -69,14 +69,14 @@ export async function readGitconfig(): Promise<string> {
   return fs.readFile(GITCONFIG_PATH, 'utf-8');
 }
 
-function removeGitBuddyIncludeIf(content: string): string {
+function removeGitBroIncludeIf(content: string): string {
   const lines = content.split('\n');
   const kept: string[] = [];
   let i = 0;
   while (i < lines.length) {
     const line = lines[i]!;
     const trimmed = line.trim();
-    const isComment = trimmed === GITBUDDY_INCLUDE_MARKER;
+    const isComment = trimmed === GITBRO_INCLUDE_MARKER;
     const isIncludeIf = trimmed.startsWith('[includeIf "gitdir:');
     if (isComment || isIncludeIf) {
       const blockStart = i;
@@ -86,7 +86,7 @@ function removeGitBuddyIncludeIf(content: string): string {
       }
       if (i < lines.length && lines[i]!.trim().startsWith('path =')) {
         const pathLine = lines[i]!;
-        if (pathLine.includes('.gitbuddy')) {
+        if (pathLine.includes('.gitbro')) {
           i++;
           if (i < lines.length && lines[i]!.trim() === '') i++;
           continue;
@@ -112,7 +112,7 @@ function buildIncludeIfSection(gitdirPattern: string, configPath: string): strin
   const safePattern = sanitizeGitdirPattern(gitdirPattern);
   const normalizedPath = configPath.startsWith('/') ? configPath : path.resolve(configPath);
   return [
-    `${GITBUDDY_INCLUDE_MARKER}`,
+    `${GITBRO_INCLUDE_MARKER}`,
     `[includeIf "gitdir:${safePattern}"]`,
     `    path = ${normalizedPath}`,
     '',
@@ -123,7 +123,7 @@ export async function updateGitconfigIncludeIf(
   directoryToIdentity: Array<{ directory: string; identityId: string }>
 ): Promise<void> {
   const content = await readGitconfig();
-  const before = removeGitBuddyIncludeIf(content);
+  const before = removeGitBroIncludeIf(content);
 
   const sections = directoryToIdentity.map(({ directory, identityId }) => {
     const pattern = directory.endsWith('/') ? directory : `${directory}/`;

@@ -26,7 +26,7 @@ export async function runApply(): Promise<void> {
   }
 
   await withSpinner(
-    'Writing identity gitconfigs to ~/.gitbuddy/gitconfigs',
+    'Writing identity gitconfigs to ~/.gitbro/gitconfigs',
     () => syncAllIdentityGitconfigs(config.identities),
     { successMessage: 'Git config files written', failureMessage: 'Failed to write git configs' }
   );
