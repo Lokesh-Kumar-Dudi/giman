@@ -114,3 +114,16 @@ export async function promptUpdateSshConfig(): Promise<boolean> {
     true
   );
 }
+
+export async function promptSelectIdentity(identities: Identity[]): Promise<Identity> {
+  const { id } = await inquirer.prompt<{ id: string }>({
+    type: 'list',
+    name: 'id',
+    message: 'Select identity (profile) for this clone:',
+    choices: identities.map((i) => ({
+      name: `${i.id} — ${i.name} <${i.email}> (${i.sshHost})`,
+      value: i.id,
+    })),
+  });
+  return identities.find((i) => i.id === id)!;
+}
