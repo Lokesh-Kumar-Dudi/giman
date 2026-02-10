@@ -32,7 +32,7 @@ export function registerIdentityCommands(program: Command): void {
       if (identities.length === 0) {
         section('Identities');
         info('No identities configured yet.');
-        console.log('  Run ' + chalk.cyan('gib init') + ' or ' + chalk.cyan('gib identity add') + ' to get started.');
+        console.log('  Run ' + chalk.cyan('gid init') + ' or ' + chalk.cyan('gid identity add') + ' to get started.');
         return;
       }
       section('Identities');
@@ -82,7 +82,7 @@ export function registerIdentityCommands(program: Command): void {
 
       console.log('');
       success('Identity "' + fields.id + '" added.');
-      info('Map directories to this identity: ' + chalk.cyan('gib dir add <path> --identity ' + fields.id));
+      info('Map directories to this identity: ' + chalk.cyan('gid dir add <path> --identity ' + fields.id));
     });
 
   identity
@@ -91,7 +91,7 @@ export function registerIdentityCommands(program: Command): void {
     .action(async (id: string) => {
       const existing = await getIdentity(id);
       if (!existing) {
-        failure('Identity not found', `"${id}" is not in your config. Use gib identity list to see identities.`);
+        failure('Identity not found', `"${id}" is not in your config. Use gid identity list to see identities.`);
         process.exit(1);
       }
       section('Edit identity: ' + id);
@@ -114,7 +114,7 @@ export function registerIdentityCommands(program: Command): void {
     .action(async (id: string) => {
       const existing = await getIdentity(id);
       if (!existing) {
-        failure('Identity not found', `"${id}" is not in your config. Use gib identity list to see identities.`);
+        failure('Identity not found', `"${id}" is not in your config. Use gid identity list to see identities.`);
         process.exit(1);
       }
       await withSpinner(
@@ -138,7 +138,7 @@ export function registerIdentityCommands(program: Command): void {
     .action(async (id: string) => {
       const i = await getIdentity(id);
       if (!i) {
-        failure('Identity not found', `"${id}" is not in your config. Use gib identity list to see identities.`);
+        failure('Identity not found', `"${id}" is not in your config. Use gid identity list to see identities.`);
         process.exit(1);
       }
       section('Identity: ' + i.id);
@@ -150,7 +150,7 @@ export function registerIdentityCommands(program: Command): void {
       if (i.directories.length) {
         i.directories.forEach((d) => console.log('    ' + toTildePath(d)));
       } else {
-        console.log(chalk.gray('    (none) — add with gib dir add <path> --identity ' + i.id));
+        console.log(chalk.gray('    (none) — add with gid dir add <path> --identity ' + i.id));
       }
     });
 }

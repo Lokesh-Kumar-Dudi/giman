@@ -1,4 +1,4 @@
-# GitBro (gib) — Documentation
+# GiMan (gid) — Documentation
 
   
 
@@ -16,7 +16,7 @@ Manage multiple Git identities via SSH so you can use personal and work GitHub a
 
 ```bash
 
-npm  install  -g  gitbro
+npm  install  -g  giman
 
 ```
 
@@ -34,13 +34,13 @@ Requires **Node.js 18+**.
 
   
 
-1.  **Initialize** (creates `~/.gitbro/config.json`, detects existing config):
+1.  **Initialize** (creates `~/.giman/config.json`, detects existing config):
 
   
 
 ```bash
 
-gib init
+gid init
 
 ```
 
@@ -52,9 +52,9 @@ gib init
 
 ```bash
 
-gib dir add ~/dev/personal --identity personal
+gid dir add ~/dev/personal --identity personal
 
-gib dir add ~/dev/work --identity work
+gid dir add ~/dev/work --identity work
 
 ```
 
@@ -66,7 +66,7 @@ gib dir add ~/dev/work --identity work
 
 ```bash
 
-gib status
+gid status
 
 ```
 
@@ -83,17 +83,17 @@ gib status
 
 | Command                             | Description                                                         |
 |-------------------------------------|---------------------------------------------------------------------|
-| `gib init`                          | Interactive setup and config detection                               |
-| `gib status`                        | Show active identity for the current directory                       |
-| `gib apply`                         | Apply config to `~/.gitconfig` and `~/.ssh/config`                   |
-| `gib identity list`                 | List all identities                                                  |
-| `gib identity add`                  | Add a new identity (interactive)                                     |
-| `gib identity edit <id>`            | Edit an existing identity                                            |
-| `gib identity remove <id>`          | Remove an identity                                                   |
-| `gib identity show <id>`            | Show details for one identity                                        |
-| `gib dir add <path> --identity <id>`| Map a directory to an identity                                       |
-| `gib dir remove <path>`             | Remove a directory mapping                                           |
-| `gib dir list`                      | List all directory mappings                                          |
+| `gid init`                          | Interactive setup and config detection                               |
+| `gid status`                        | Show active identity for the current directory                       |
+| `gid apply`                         | Apply config to `~/.gitconfig` and `~/.ssh/config`                   |
+| `gid identity list`                 | List all identities                                                  |
+| `gid identity add`                  | Add a new identity (interactive)                                     |
+| `gid identity edit <id>`            | Edit an existing identity                                            |
+| `gid identity remove <id>`          | Remove an identity                                                   |
+| `gid identity show <id>`            | Show details for one identity                                        |
+| `gid dir add <path> --identity <id>`| Map a directory to an identity                                       |
+| `gid dir remove <path>`             | Remove a directory mapping                                           |
+| `gid dir list`                      | List all directory mappings                                          |
 
 
   
@@ -106,11 +106,11 @@ gib status
 
   
 
-###  `gib init`
+###  `gid init`
 
   
 
-**What it does:** One-time interactive setup. If you don’t have config yet, it walks you through creating your first identity (ID, name, email, SSH key path, SSH host alias). It then creates `~/.gitbro/config.json`, writes per-identity Git configs, updates `~/.gitconfig` with `includeIf` rules, and optionally updates `~/.ssh/config` with Host blocks.
+**What it does:** One-time interactive setup. If you don’t have config yet, it walks you through creating your first identity (ID, name, email, SSH key path, SSH host alias). It then creates `~/.giman/config.json`, writes per-identity Git configs, updates `~/.gitconfig` with `includeIf` rules, and optionally updates `~/.ssh/config` with Host blocks.
 
   
 
@@ -123,7 +123,7 @@ gib status
   
 
 ```bash
-gib  init
+gid  init
 ```
 
   
@@ -132,11 +132,11 @@ gib  init
 
   
 
-### `gib status`
+### `gid status`
 
   
 
-**What it does:** Shows which identity is active for your **current working directory**. It looks up your CWD in the directory mappings and prints the matching identity (id, name, email), or tells you no identity is mapped and suggests `gib dir add . --identity <id>`.
+**What it does:** Shows which identity is active for your **current working directory**. It looks up your CWD in the directory mappings and prints the matching identity (id, name, email), or tells you no identity is mapped and suggests `gid dir add . --identity <id>`.
 
   
 
@@ -147,7 +147,7 @@ gib  init
 ```bash
 cd  ~/dev/work/project
 
-gib  status
+gid  status
 # Identity: work — John Doe <john@company.com>
 
 ```
@@ -156,20 +156,20 @@ gib  status
 
   
 
-### `gib apply`
+### `gid apply`
 
   
 
-**What it does:** Writes the **current** state of `~/.gitbro/config.json` out to the system: updates `~/.ssh/config` (Host blocks for each identity), writes identity gitconfigs under `~/.gitbro/gitconfigs`, and refreshes `~/.gitconfig` includeIf rules. It will prompt before modifying `~/.ssh/config`.
+**What it does:** Writes the **current** state of `~/.giman/config.json` out to the system: updates `~/.ssh/config` (Host blocks for each identity), writes identity gitconfigs under `~/.giman/gitconfigs`, and refreshes `~/.gitconfig` includeIf rules. It will prompt before modifying `~/.ssh/config`.
 
   
 
-**When to use:** After you’ve added/edited identities or directory mappings (e.g. via `gib identity add`, `gib dir add`, or by editing the JSON) and want those changes to take effect. Also useful if you manually changed `~/.ssh/config` or `~/.gitconfig` and want to re-sync from GitBro.
+**When to use:** After you’ve added/edited identities or directory mappings (e.g. via `gid identity add`, `gid dir add`, or by editing the JSON) and want those changes to take effect. Also useful if you manually changed `~/.ssh/config` or `~/.gitconfig` and want to re-sync from GiMan.
 
   
 
 ```bash
-gib  apply
+gid  apply
 ```
 
   
@@ -178,7 +178,7 @@ gib  apply
 
   
 
-### `gib identity list`
+### `gid identity list`
 
   
 
@@ -191,7 +191,7 @@ gib  apply
   
 
 ```bash
-gib  identity  list
+gid  identity  list
 ```
 
   
@@ -200,11 +200,11 @@ gib  identity  list
 
   
 
-### `gib identity add`
+### `gid identity add`
 
   
 
-**What it does:** Interactive flow to add a **new** identity. Prompts for: identity ID (e.g. `personal`, `work`), display name, email, and SSH key (path or generate new). Saves to config and optionally updates `~/.ssh/config`. The new identity has no directories until you run `gib dir add`.
+**What it does:** Interactive flow to add a **new** identity. Prompts for: identity ID (e.g. `personal`, `work`), display name, email, and SSH key (path or generate new). Saves to config and optionally updates `~/.ssh/config`. The new identity has no directories until you run `gid dir add`.
 
   
 
@@ -213,7 +213,7 @@ gib  identity  list
   
 
 ```bash
-gib  identity  add
+gid  identity  add
 ```
 
   
@@ -222,11 +222,11 @@ gib  identity  add
 
   
 
-### `gib identity edit <id>`
+### `gid identity edit <id>`
 
   
 
-**What it does:** Edits an existing identity by **id**. Prompts for name, email, and SSH host alias (existing values pre-filled). Updates only those fields in config; it does **not** change the SSH key path. After editing, run `gib apply` if you want SSH/gitconfig rewritten immediately.
+**What it does:** Edits an existing identity by **id**. Prompts for name, email, and SSH host alias (existing values pre-filled). Updates only those fields in config; it does **not** change the SSH key path. After editing, run `gid apply` if you want SSH/gitconfig rewritten immediately.
 
   
 
@@ -235,7 +235,7 @@ gib  identity  add
   
 
 ```bash
-gib  identity  edit  work
+gid  identity  edit  work
 ```
 
   
@@ -244,7 +244,7 @@ gib  identity  edit  work
 
   
 
-### `gib identity remove <id>`
+### `gid identity remove <id>`
 
   
 
@@ -257,7 +257,7 @@ gib  identity  edit  work
   
 
 ```bash
-gib  identity  remove  work
+gid  identity  remove  work
 ```
 
   
@@ -266,7 +266,7 @@ gib  identity  remove  work
 
   
 
-### `gib identity show <id>`
+### `gid identity show <id>`
 
   
 
@@ -279,7 +279,7 @@ gib  identity  remove  work
   
 
 ```bash
-gib  identity  show  personal
+gid  identity  show  personal
 ```
 
   
@@ -288,11 +288,11 @@ gib  identity  show  personal
 
   
 
-### `gib dir add <path> --identity <id>`
+### `gid dir add <path> --identity <id>`
 
   
 
-**What it does:** Maps a **directory path** to an identity. Any repo inside that path (including subdirectories) will use that identity’s `user.name`, `user.email`, and SSH key. Path can be absolute or use `~`; `.` means current directory. The identity must already exist (from `gib init` or `gib identity add`).
+**What it does:** Maps a **directory path** to an identity. Any repo inside that path (including subdirectories) will use that identity’s `user.name`, `user.email`, and SSH key. Path can be absolute or use `~`; `.` means current directory. The identity must already exist (from `gid init` or `gid identity add`).
 
   
 
@@ -305,8 +305,8 @@ gib  identity  show  personal
   
 
 ```bash
-gib  dir  add  ~/dev/personal  --identity  personal
-gib  dir  add  .  --identity  work
+gid  dir  add  ~/dev/personal  --identity  personal
+gid  dir  add  .  --identity  work
 ```
 
   
@@ -315,11 +315,11 @@ gib  dir  add  .  --identity  work
 
   
 
-### `gib dir remove <path>`
+### `gid dir remove <path>`
 
   
 
-**What it does:** Removes the directory mapping for the given path. The path is resolved the same way as for `dir add` (e.g. `~` expanded). Repos under that path will no longer auto-use an identity from GitBro until you add a mapping again.
+**What it does:** Removes the directory mapping for the given path. The path is resolved the same way as for `dir add` (e.g. `~` expanded). Repos under that path will no longer auto-use an identity from GiMan until you add a mapping again.
 
   
 
@@ -328,7 +328,7 @@ gib  dir  add  .  --identity  work
   
 
 ```bash
-gib  dir  remove  ~/dev/work
+gid  dir  remove  ~/dev/work
 ```
 
   
@@ -337,7 +337,7 @@ gib  dir  remove  ~/dev/work
 
   
 
-### `gib dir list`
+### `gid dir list`
 
   
 
@@ -350,7 +350,7 @@ gib  dir  remove  ~/dev/work
   
 
 ```bash
-gib  dir  list
+gid  dir  list
 ```
 
   
@@ -369,13 +369,13 @@ gib  dir  list
 
 ```bash
 # One-time setup
-gib  init
+gid  init
 # Create "personal" (name, email, SSH key path)
 
 # Create "work" (name, email, SSH key path)
-gib  dir  add  ~/dev/personal  --identity  personal
-gib  dir  add  ~/dev/work  --identity  work
-gib  apply
+gid  dir  add  ~/dev/personal  --identity  personal
+gid  dir  add  ~/dev/work  --identity  work
+gid  apply
 
 ```
 
@@ -457,13 +457,13 @@ git  remote  -v
   
 
 ```bash
-gib  identity  list
+gid  identity  list
 
-gib  identity  show  personal
+gid  identity  show  personal
 
-gib  dir  list
+gid  dir  list
 
-gib  status
+gid  status
 ```
 
   
@@ -476,9 +476,9 @@ gib  status
 
   
 
--  **GitBro config:**  `~/.gitbro/config.json` (identities, SSH key paths, directory mappings).
+-  **GiMan config:**  `~/.giman/config.json` (identities, SSH key paths, directory mappings).
 
--  **Git:**  `~/.gitconfig` gets `includeIf` directives when you run `gib init`, `gib identity add`, `gib dir add`, or `gib apply`.
+-  **Git:**  `~/.gitconfig` gets `includeIf` directives when you run `gid init`, `gid identity add`, `gid dir add`, or `gid apply`.
 
 -  **SSH:**  `~/.ssh/config` gets `Host` blocks for each identity (e.g. `github-personal`, `github-work`) when you run those commands (with your permission).
 

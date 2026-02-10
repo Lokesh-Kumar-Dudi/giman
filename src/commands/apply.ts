@@ -8,7 +8,7 @@ import { section, info, success, failure, withSpinner } from '../utils/ui.js';
 export async function runApply(): Promise<void> {
   const config = await readConfig();
   if (!config || config.identities.length === 0) {
-    failure('Nothing to apply', 'No config or identities found. Run gib init first.');
+    failure('Nothing to apply', 'No config or identities found. Run gid init first.');
     process.exit(1);
   }
 
@@ -26,7 +26,7 @@ export async function runApply(): Promise<void> {
   }
 
   await withSpinner(
-    'Writing identity gitconfigs to ~/.gitbro/gitconfigs',
+    'Writing identity gitconfigs to ~/.giman/gitconfigs',
     () => syncAllIdentityGitconfigs(config.identities),
     { successMessage: 'Git config files written', failureMessage: 'Failed to write git configs' }
   );

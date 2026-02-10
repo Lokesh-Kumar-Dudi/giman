@@ -23,8 +23,8 @@ export const ConfigSchema = z.object({
 
 export type Config = z.infer<typeof ConfigSchema>;
 
-export const DEFAULT_CONFIG_PATH = '~/.gitbro/config.json';
-export const DEFAULT_GITBRO_DIR = '~/.gitbro';
-export const DEFAULT_GITCONFIGS_DIR = '~/.gitbro/gitconfigs';
+export const DEFAULT_CONFIG_PATH = '~/.giman/config.json';
+export const DEFAULT_GIMAN_DIR = '~/.giman';
+export const DEFAULT_GITCONFIGS_DIR = '~/.giman/gitconfigs';
 export const DEFAULT_SSH_DIR = '~/.ssh';
-export const GITBRO_SSH_CONFIG_MARKER = '# GitBro:';
+export const GIMAN_SSH_CONFIG_MARKER = '# GiMan:';

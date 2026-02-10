@@ -23,7 +23,7 @@ export function registerDirectoryCommands(program: Command): void {
     .action(async (pathArg: string, opts: { identity: string }) => {
       const config = await readConfig();
       if (!config) {
-        failure('No config found', 'Run gib init first to create ~/.gitbro/config.json');
+        failure('No config found', 'Run gid init first to create ~/.giman/config.json');
         process.exit(1);
       }
       const normalized = resolveHome(pathArg);
@@ -69,7 +69,7 @@ export function registerDirectoryCommands(program: Command): void {
       if (withDirs.length === 0) {
         section('Directory mappings');
         info('No directory mappings yet. Git will not auto-switch identity by folder.');
-        console.log('  Add one: ' + chalk.cyan('gib dir add ~/path --identity <id>'));
+        console.log('  Add one: ' + chalk.cyan('gid dir add ~/path --identity <id>'));
         return;
       }
       section('Directory mappings');

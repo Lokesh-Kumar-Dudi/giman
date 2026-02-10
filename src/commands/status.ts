@@ -9,7 +9,7 @@ export async function runStatus(): Promise<void> {
   if (!config || config.identities.length === 0) {
     section('Status');
     info('No identities configured yet.');
-    console.log('  Run ' + chalk.cyan('gib init') + ' to set up your first identity.');
+    console.log('  Run ' + chalk.cyan('gid init') + ' to set up your first identity.');
     return;
   }
 
@@ -39,6 +39,6 @@ export async function runStatus(): Promise<void> {
     info('Commits and push/pull here will use this identity.');
   } else {
     info('No identity is mapped for this directory.');
-    console.log('  Map it: ' + chalk.cyan('gib dir add . --identity <id>'));
+    console.log('  Map it: ' + chalk.cyan('gid dir add . --identity <id>'));
   }
 }

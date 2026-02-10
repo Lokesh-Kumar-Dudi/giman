@@ -9,8 +9,8 @@ import { runApply } from './commands/apply.js';
 const program = new Command();
 
 program
-  .name('gib')
-  .description('GitBro - manage multiple git identities via SSH')
+  .name('gid')
+  .description('GiMan - manage multiple git identities via SSH')
   .version('1.0.0');
 
 program.command('init').description('Interactive setup; detects existing config').action(runInit);

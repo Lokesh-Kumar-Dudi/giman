@@ -1,10 +1,10 @@
 {
-  "name": "gitbro",
+  "name": "giman",
   "version": "1.0.0",
   "description": "Manage multiple git identities via SSH for multiple GitHub accounts",
   "main": "dist/index.js",
   "bin": {
-    "gib": "dist/index.js"
+    "gid": "dist/index.js"
   },
   "scripts": {
     "build": "tsc",
