@@ -86,6 +86,7 @@ gid status
 | `gid init`                          | Interactive setup and config detection                               |
 | `gid status`                        | Show active identity for the current directory                       |
 | `gid apply`                         | Apply config to `~/.gitconfig` and `~/.ssh/config`                   |
+| `gid clone <repo-url> [directory]`  | Clone a repo; prompts to select identity (profile) for the clone     |
 | `gid identity list`                 | List all identities                                                  |
 | `gid identity add`                  | Add a new identity (interactive)                                     |
 | `gid identity edit <id>`            | Edit an existing identity                                            |
@@ -170,6 +171,32 @@ gid  status
 
 ```bash
 gid  apply
+```
+
+  
+
+---
+
+  
+
+### `gid clone <repo-url> [directory]`
+
+  
+
+**What it does:** Clones a repository using an SSH URL (e.g. `git@github.com:user/repo.git`). Prompts you to **select an identity (profile)** from your configured identities; then rewrites the URL to use that identity’s SSH host alias and runs `git clone`. Optional second argument is the target directory (same as `git clone <url> [directory]`).
+
+  
+
+**When to use:** When you want to clone a repo and have GiMan prompt you to pick which account/identity to use, without remembering or typing the SSH host alias.
+
+  
+
+```bash
+gid  clone  git@github.com:someone/repo.git
+# Prompts: Select identity (profile) for this clone: personal / work / ...
+
+gid  clone  git@github.com:someone/repo.git  ./my-repo
+# Same, but clones into ./my-repo
 ```
 
   
@@ -385,9 +412,21 @@ gid  apply
 
   
 
-Use the **SSH host alias** for the identity when cloning:
+**Option 1 — use `gid clone` (prompts for profile):**
 
   
+
+```bash
+gid  clone  git@github.com:username/my-repo.git
+# Prompts you to select an identity (personal, work, …), then clones with that identity
+```
+
+  
+
+**Option 2 — use the SSH host alias directly:**
+
+  
+
 | Identity  | SSH Host Alias (used in URL) | Example Clone URL                                  |
 |-----------|------------------------------|----------------------------------------------------|
 | personal  | `github-personal`            | `git@github-personal:username/repo.git`            |
