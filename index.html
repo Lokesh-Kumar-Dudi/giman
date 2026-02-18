@@ -1,59 +1,264 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>GiMan (gid) – Multiple Git identities via SSH</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
   <style>
-    :root { --bg: #0d1117; --card: #161b22; --text: #e6edf3; --muted: #8b949e; --accent: #58a6ff; --green: #3fb950; }
-    * { box-sizing: border-box; }
-    body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; line-height: 1.6; }
-    main { max-width: 560px; width: 100%; }
-    h1 { font-size: 1.75rem; font-weight: 600; margin: 0 0 0.5rem; }
-    .tagline { color: var(--muted); margin-bottom: 2rem; }
-    a { color: var(--accent); text-decoration: none; }
-    a:hover { text-decoration: underline; }
-    .btn { display: inline-block; background: var(--green); color: #fff; padding: 0.6rem 1.2rem; border-radius: 6px; font-weight: 500; margin-right: 0.75rem; margin-bottom: 0.5rem; }
-    .btn:hover { opacity: 0.9; text-decoration: none; }
-    .btn.secondary { background: var(--card); border: 1px solid #30363d; color: var(--text); }
-    section { background: var(--card); border: 1px solid #21262d; border-radius: 8px; padding: 1.25rem 1.5rem; margin-bottom: 1rem; }
-    section h2 { font-size: 0.9rem; font-weight: 600; margin: 0 0 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
-    code { background: #21262d; padding: 0.2em 0.4em; border-radius: 4px; font-size: 0.9em; }
-    pre { background: #21262d; padding: 1rem; border-radius: 6px; overflow-x: auto; margin: 0; font-size: 0.85rem; }
-    pre code { padding: 0; background: none; }
-    .docs-link { margin-top: 1.5rem; font-size: 0.95rem; }
+    /* Custom Fonts & Base overrides */
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #0d1117; /* Original BG */
+      color: #e6edf3; /* Original Text */
+      -webkit-font-smoothing: antialiased;
+    }
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    
+    /* Subtle Gradients */
+    .hero-glow {
+      background: radial-gradient(circle at 50% 0%, rgba(88, 166, 255, 0.15) 0%, transparent 50%);
+    }
+
+    /* Terminal Window Controls */
+    .window-control {
+      width: 0.75rem;
+      height: 0.75rem;
+      border-radius: 9999px;
+    }
+    
+    /* Animation for loading state */
+    @keyframes pulse-opacity {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    .animate-pulse-slow {
+      animation: pulse-opacity 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    /* Custom scrollbar for pre blocks */
+    pre::-webkit-scrollbar {
+      height: 6px;
+    }
+    pre::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    pre::-webkit-scrollbar-thumb {
+      background: #30363d;
+      border-radius: 3px;
+    }
   </style>
 </head>
-<body>
-  <main>
-    <h1>GiMan <code>gid</code></h1>
-    <p class="tagline">Manage multiple Git identities via SSH — use personal and work GitHub accounts on the same machine.</p>
-    <p>
-      <a class="btn" href="https://github.com/your-username/gitman" target="_blank" rel="noopener">View on GitHub</a>
-      <a class="btn secondary" href="README.md">Docs (Markdown)</a>
-    </p>
+<body class="min-h-screen flex flex-col relative overflow-x-hidden selection:bg-[#58a6ff] selection:text-white">
 
-    <section>
-      <h2>Install</h2>
-      <pre><code>npm install -g giman</code></pre>
-    </section>
+  <!-- Background Effects -->
+  <div class="fixed inset-0 pointer-events-none hero-glow z-0"></div>
+  <div class="fixed top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#30363d] to-transparent z-10"></div>
 
-    <section>
-      <h2>Quick start</h2>
-      <pre><code>gid init</code></pre>
-      <p style="margin: 0.75rem 0 0; color: var(--muted); font-size: 0.9rem;">Then map directories to identities:</p>
-      <pre><code>gid dir add ~/dev/personal --identity personal
-gid dir add ~/dev/work --identity work</code></pre>
-    </section>
+  <!-- Navbar -->
+  <nav class="relative z-50 w-full max-w-6xl mx-auto px-6 py-6 flex justify-between items-center">
+    <div class="flex items-center gap-2 group cursor-default">
+      <span class="text-sm font-semibold tracking-tight text-white">GiMan</span>
+    </div>
+    <div class="flex items-center gap-4">
+      <a href="https://github.com/Lokesh-Kumar-Dudi/giman" target="_blank" rel="noopener" class="text-xs font-medium text-[#8b949e] hover:text-white transition-colors flex items-center gap-1.5">
+        <iconify-icon icon="solar:brand-github-linear" width="16"></iconify-icon>
+        GitHub
+      </a>
+    </div>
+  </nav>
 
-    <section>
-      <h2>Commands</h2>
-      <p style="margin: 0;"><code>gid init</code> · <code>gid status</code> · <code>gid apply</code><br />
-      <code>gid identity list|add|edit|remove|show</code><br />
-      <code>gid dir add &lt;path&gt; --identity &lt;id&gt;</code> · <code>gid dir remove|list</code></p>
-    </section>
+  <!-- Hero Section -->
+  <main class="relative z-10 flex-grow flex flex-col items-center justify-center pt-12 pb-20 px-6">
+    
+    <!-- Hero Text -->
+    <div class="text-center max-w-2xl mx-auto mb-12 space-y-6">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#30363d] bg-[#161b22]/50 backdrop-blur-sm">
+        <span class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#3fb950] opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-[#3fb950]"></span>
+        </span>
+        <span class="text-xs font-medium text-[#8b949e] tracking-wide" id="downloads-row">
+          <span id="npm-downloads" class="text-[#e6edf3]">Loading...</span> developers love it already!
+        </span>
+      </div>
 
-    <p class="docs-link">For examples, SSH host aliases, and full usage → <a href="README.md">docs/README.md</a></p>
+      <h1 class="text-4xl md:text-6xl font-semibold tracking-tight text-white leading-[1.1]">
+        Git identities, <br/>
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#58a6ff] to-[#3fb950]">managed.</span>
+      </h1>
+      
+      <p class="text-base md:text-lg text-[#8b949e] leading-relaxed max-w-2xl mx-auto">
+        Switch between personal and work GitHub accounts seamlessly. <br/> Map directories to identities and forget about SSH config headaches.
+      </p>
+
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
+        <div class="flex items-center bg-[#161b22] border border-[#30363d] rounded-md pl-4 pr-1 py-1 group focus-within:border-[#58a6ff] transition-all">
+          <span class="text-[#8b949e] select-none font-mono text-xs mr-2">$</span>
+          <code class="font-mono text-sm text-[#e6edf3] outline-none bg-transparent">npm install -g giman</code>
+          <button onclick="navigator.clipboard.writeText('npm install -g giman')" class="ml-3 p-1.5 rounded hover:bg-[#21262d] text-[#8b949e] hover:text-white transition-colors" title="Copy">
+             <iconify-icon icon="solar:copy-linear" width="16"></iconify-icon>
+          </button>
+        </div>
+        <a href="#quick-start" class="px-5 py-2.5 rounded-md bg-[#3fb950] hover:bg-[#3fb950]/90 text-white text-sm font-medium transition-all shadow-[0_0_15px_rgba(63,185,80,0.3)] hover:shadow-[0_0_25px_rgba(63,185,80,0.5)]">
+          Get Started
+        </a>
+      </div>
+    </div>
+
+    <!-- Terminal Visual -->
+    <div class="w-full max-w-3xl mx-auto animate-[fadeIn_1s_ease-out]">
+      <div class="rounded-xl border border-[#30363d] bg-[#0d1117] overflow-hidden shadow-2xl shadow-black/50">
+        <!-- Terminal Header -->
+        <div class="bg-[#161b22] px-4 py-3 flex items-center justify-between border-b border-[#30363d]">
+          <div class="flex gap-2">
+            <div class="window-control bg-[#ff5f56]"></div>
+            <div class="window-control bg-[#ffbd2e]"></div>
+            <div class="window-control bg-[#27c93f]"></div>
+          </div>
+          <div class="text-xs text-[#8b949e] font-mono">bash — gid</div>
+          <div class="w-10"></div> <!-- spacer -->
+        </div>
+        <!-- Terminal Body -->
+        <div class="p-6 font-mono text-sm overflow-x-auto">
+          <div class="flex flex-col gap-2">
+            <!-- Line 1 -->
+            <div class="flex">
+              <span class="text-[#3fb950] mr-2">➜</span>
+              <span class="text-[#58a6ff] mr-2">~</span>
+              <span class="text-[#e6edf3]">gid init</span>
+            </div>
+            <div class="text-[#8b949e] pl-6 pb-2">Initializing GiMan configuration... Done.</div>
+            
+            <!-- Line 2 -->
+            <div class="flex">
+              <span class="text-[#3fb950] mr-2">➜</span>
+              <span class="text-[#58a6ff] mr-2">~</span>
+              <span class="text-[#e6edf3]">gid dir add ~/dev/personal --identity personal</span>
+            </div>
+             <div class="text-[#8b949e] pl-6 pb-2">Directory mapped: <span class="text-[#e6edf3]">~/dev/personal</span> → <span class="text-[#58a6ff]">personal</span></div>
+
+            <!-- Line 3 -->
+            <div class="flex">
+              <span class="text-[#3fb950] mr-2">➜</span>
+              <span class="text-[#58a6ff] mr-2">~</span>
+              <span class="text-[#e6edf3]">gid dir add ~/dev/work --identity work</span>
+            </div>
+            <div class="text-[#8b949e] pl-6 pb-2">Directory mapped: <span class="text-[#e6edf3]">~/dev/work</span> → <span class="text-[#3fb950]">work</span></div>
+
+            <!-- Line 4 -->
+            <div class="flex">
+              <span class="text-[#3fb950] mr-2">➜</span>
+              <span class="text-[#58a6ff] mr-2">~</span>
+              <span class="text-[#e6edf3]">git clone git@github.com:company/project.git</span>
+            </div>
+            <div class="text-[#8b949e] pl-6">
+              Using identity: <span class="text-[#3fb950]">work</span><br/>
+              Cloning into 'project'...
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </main>
+
+  <!-- Features Grid -->
+  <section class="relative z-10 w-full max-w-5xl mx-auto px-6 py-20 border-t border-[#30363d]/50" id="quick-start">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      
+      <!-- Feature 1 -->
+      <div class="p-6 rounded-lg bg-[#161b22] border border-[#30363d] hover:border-[#58a6ff]/50 transition-colors group">
+        <div class="w-10 h-10 rounded-full bg-[#21262d] flex items-center justify-center text-[#58a6ff] mb-4 group-hover:bg-[#58a6ff]/10">
+          <iconify-icon icon="solar:bolt-linear" width="20"></iconify-icon>
+        </div>
+        <h3 class="text-base font-semibold text-white mb-2 tracking-tight">Quick Setup</h3>
+        <p class="text-sm text-[#8b949e] mb-4">Initialize with a single command. No complex config files to edit manually.</p>
+        <code class="text-xs bg-[#0d1117] border border-[#30363d] px-2 py-1 rounded text-[#e6edf3] font-mono">gid init</code>
+      </div>
+
+      <!-- Feature 2 -->
+      <div class="p-6 rounded-lg bg-[#161b22] border border-[#30363d] hover:border-[#3fb950]/50 transition-colors group">
+        <div class="w-10 h-10 rounded-full bg-[#21262d] flex items-center justify-center text-[#3fb950] mb-4 group-hover:bg-[#3fb950]/10">
+          <iconify-icon icon="solar:folder-with-files-linear" width="20"></iconify-icon>
+        </div>
+        <h3 class="text-base font-semibold text-white mb-2 tracking-tight">Context Aware</h3>
+        <p class="text-sm text-[#8b949e] mb-4">Automatically switches SSH keys based on the directory you are working in.</p>
+        <code class="text-xs bg-[#0d1117] border border-[#30363d] px-2 py-1 rounded text-[#e6edf3] font-mono">gid dir add &lt;path&gt;</code>
+      </div>
+
+      <!-- Feature 3 -->
+      <div class="p-6 rounded-lg bg-[#161b22] border border-[#30363d] hover:border-[#a371f7]/50 transition-colors group md:col-span-2 lg:col-span-1">
+        <div class="w-10 h-10 rounded-full bg-[#21262d] flex items-center justify-center text-[#a371f7] mb-4 group-hover:bg-[#a371f7]/10">
+          <iconify-icon icon="solar:command-linear" width="20"></iconify-icon>
+        </div>
+        <h3 class="text-base font-semibold text-white mb-2 tracking-tight">Full Control</h3>
+        <p class="text-sm text-[#8b949e] mb-4">Manage identities, list status, and apply changes instantly from the terminal.</p>
+        <div class="flex gap-2 flex-wrap">
+          <code class="text-xs bg-[#0d1117] border border-[#30363d] px-2 py-1 rounded text-[#e6edf3] font-mono">gid status</code>
+          <code class="text-xs bg-[#0d1117] border border-[#30363d] px-2 py-1 rounded text-[#e6edf3] font-mono">gid identity list</code>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="w-full border-t border-[#30363d] bg-[#161b22] py-12 mt-auto relative z-10">
+    <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
+      <div class="text-center md:text-left">
+        <p class="text-sm text-[#8b949e]">
+          Designed for developers who juggle multiple hats.
+        </p>
+        <p class="text-xs text-[#8b949e] mt-2 opacity-60">
+          &copy; <script>document.write(new Date().getFullYear())</script> GiMan. MIT License.
+        </p>
+      </div>
+      <div class="flex gap-6">
+        <a href="README.md" class="text-sm text-[#58a6ff] hover:text-[#58a6ff]/80 transition-colors">Documentation</a>
+        <a href="https://https://github.com/Lokesh-Kumar-Dudi/giman" class="text-sm text-[#e6edf3] hover:text-white transition-colors">GitHub</a>
+        <a href="https://npmjs.com/package/giman" class="text-sm text-[#e6edf3] hover:text-white transition-colors">NPM</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Logic Script -->
+  <script>
+    (function () {
+      var el = document.getElementById('npm-downloads');
+      var row = document.getElementById('downloads-row');
+      
+      if (!el || !row) return;
+      
+      // Animation class added by default in HTML or handled here
+      el.classList.add('animate-pulse-slow');
+      
+      var today = new Date();
+      var end = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+      // Changed start date from 2026 to 2020 to ensure valid range for API
+      var url = 'https://api.npmjs.org/downloads/point/2020-01-01:' + end + '/giman';
+      
+      fetch(url)
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          el.classList.remove('animate-pulse-slow');
+          if (data.downloads != null) {
+            el.textContent = data.downloads.toLocaleString();
+            row.title = "Total downloads since 2020";
+          } else {
+            el.textContent = '—';
+          }
+        })
+        .catch(function () {
+          el.classList.remove('animate-pulse-slow');
+          el.textContent = '—';
+        });
+    })();
+  </script>
 </body>
 </html>

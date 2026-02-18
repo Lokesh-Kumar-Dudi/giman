@@ -4,6 +4,8 @@
 
 Manage multiple Git identities via SSH so you can use personal and work GitHub accounts on the same machine.
 
+**Links:** [Source code](https://github.com/lokesh-kumar-dudi/giman) · [Issues](https://github.com/lokesh-kumar-dudi/giman/issues) · [Documentation (web)](https://lokesh-kumar-dudi.github.io/giman/)
+
   
 
 ---

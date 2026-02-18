@@ -1,6 +1,6 @@
 {
   "name": "giman",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Manage multiple git identities via SSH for multiple GitHub accounts",
   "main": "dist/index.js",
   "bin": {
