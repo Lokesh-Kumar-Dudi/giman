@@ -1,623 +1,1127 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GiMan (gid) – Multiple Git identities via SSH</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+  <title>GiMan (gid) — Multiple Git identities via SSH</title>
+  <meta name="description" content="GiMan manages multiple Git identities via SSH. Map directories to identities so personal and work GitHub accounts coexist on one machine." />
+  <meta name="theme-color" content="#F4F4F0" />
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 
   <style>
-    /* Custom Fonts & Base overrides */
-    body {
-      font-family: 'Inter', sans-serif;
-      background-color: #0d1117; /* Original BG */
-      color: #e6edf3; /* Original Text */
-      -webkit-font-smoothing: antialiased;
-    }
-    .font-mono {
-      font-family: 'JetBrains Mono', monospace;
-    }
-    
-    /* Subtle Gradients */
-    .hero-glow {
-      background: radial-gradient(circle at 50% 0%, rgba(88, 166, 255, 0.15) 0%, transparent 50%);
+    /* ==========================================================================
+       GIMAN® — INDUSTRIAL PRINT SYSTEM / REV 1.0.4
+       Substrate: unbleached documentation paper. Ink: carbon. Accent: aviation red.
+       Constraints: zero border-radius, zero gradients on chrome, single accent.
+       ========================================================================== */
+
+    :root {
+      --paper:      #F4F4F0;
+      --paper-2:    #EAE8E3;
+      --paper-3:    #DEDBD4;
+      --ink:        #050505;
+      --ink-2:      #111111;
+      --ink-mute:   #6E6B64;
+      --ink-faint:  #9C988F;
+      --red:        #E61919;
+
+      /* inverted panels (solid ink blocks) */
+      --on-ink:      #F4F4F0;
+      --on-ink-mute: #8B8880;
+
+      --rule:      1px solid var(--ink);
+      --rule-2:    2px solid var(--ink);
+      --rule-soft: 1px solid var(--paper-3);
+
+      --pad:  clamp(1.25rem, 4vw, 4rem);
+      --pad-y: clamp(3rem, 7vw, 6.5rem);
+
+      --sans: 'Inter', system-ui, -apple-system, sans-serif;
+      --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+      --display: 'Archivo Black', 'Inter', sans-serif;
     }
 
-    /* Terminal Window Controls */
-    .window-control {
-      width: 0.75rem;
-      height: 0.75rem;
-      border-radius: 9999px;
+    *, *::before, *::after { box-sizing: border-box; border-radius: 0 !important; }
+
+    html { scroll-behavior: smooth; scroll-padding-top: 4.5rem; -webkit-text-size-adjust: 100%; }
+
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 16px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
     }
-    
-    /* Custom scrollbar for pre blocks */
-    pre::-webkit-scrollbar {
-      height: 6px;
+
+    /* --- Mechanical noise: unified physical grain across the whole substrate --- */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      pointer-events: none;
+      opacity: .34;
+      mix-blend-mode: multiply;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
     }
-    pre::-webkit-scrollbar-track {
-      background: transparent;
+
+    ::selection { background: var(--red); color: var(--paper); }
+
+    a { color: inherit; text-decoration: none; }
+    :focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
+
+    hr { border: 0; border-top: var(--rule); margin: 0; }
+
+    /* ==================== TYPOGRAPHY ==================== */
+
+    .macro {
+      font-family: var(--display);
+      font-weight: 400;
+      text-transform: uppercase;
+      letter-spacing: -0.045em;
+      line-height: 0.86;
+      margin: 0;
     }
-    pre::-webkit-scrollbar-thumb {
-      background: #30363d;
-      border-radius: 3px;
+    /* floor kept low so the longest word ("IDENTITIES,") clears 360px viewports */
+    .macro--xl { font-size: clamp(2.9rem, 13.5vw, 11.5rem); }
+    .macro--l  { font-size: clamp(2.1rem, 6.2vw, 4.6rem); letter-spacing: -0.04em; }
+    .macro--m  { font-size: clamp(1.5rem, 3.4vw, 2.5rem); letter-spacing: -0.035em; line-height: 0.92; }
+
+    .mono {
+      font-family: var(--mono);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.11em;
+      line-height: 1.3;
     }
+    .mono--sm { font-size: 0.625rem; letter-spacing: 0.14em; }
+    .mono--md { font-size: 0.75rem; letter-spacing: 0.09em; }
+
+    .prose {
+      font-size: 0.9375rem;
+      line-height: 1.6;
+      color: var(--ink-mute);
+      max-width: 62ch;
+      margin: 0;
+    }
+    .prose strong { color: var(--ink); font-weight: 600; }
+
+    code, samp, kbd, pre, .num { font-family: var(--mono); font-variant-ligatures: none; }
+    .tnum { font-variant-numeric: tabular-nums; }
+
+    .c-red   { color: var(--red); }
+    .c-mute  { color: var(--ink-mute); }
+    .c-faint { color: var(--ink-faint); }
+
+    /* inline code — a stamped chip, not a rounded pill */
+    .ic {
+      font-size: 0.85em;
+      background: var(--paper-2);
+      border: var(--rule-soft);
+      padding: 0.05em 0.3em;
+      color: var(--ink);
+      white-space: nowrap;
+    }
+
+    /* ==================== FRAME / GUTTERS ==================== */
+
+    .frame {
+      max-width: 1480px;
+      margin: 0 auto;
+      border-left: var(--rule);
+      border-right: var(--rule);
+      position: relative;
+    }
+
+    .sec { border-bottom: var(--rule); padding: var(--pad-y) var(--pad); position: relative; }
+    .sec--flush { padding: 0; }
+
+    /* Section index header: [ 02 / HOW IT WORKS ] */
+    .sec-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.75rem 1.25rem; margin-bottom: 1.5rem; }
+    .sec-tag {
+      font-family: var(--mono); font-size: 0.625rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.16em;
+      border: var(--rule); padding: 0.3rem 0.6rem; white-space: nowrap;
+    }
+    .sec-tag--red { background: var(--red); border-color: var(--red); color: var(--paper); }
+    .sec-rule { flex: 1 1 6rem; height: 1px; background: var(--ink); align-self: center; min-width: 2rem; }
+    .sec-lede { margin-top: 1.25rem; margin-bottom: clamp(2rem, 4vw, 3.25rem); }
+
+    /* Crosshair registration marks at panel corners */
+    .xh { position: relative; }
+    .xh > .xh-m {
+      position: absolute; width: 11px; height: 11px; pointer-events: none; color: var(--red);
+    }
+    .xh > .xh-m::before, .xh > .xh-m::after {
+      content: ''; position: absolute; background: currentColor;
+    }
+    .xh > .xh-m::before { left: 0; right: 0; top: 5px; height: 1px; }
+    .xh > .xh-m::after  { top: 0; bottom: 0; left: 5px; width: 1px; }
+    .xh-m.tl { top: -6px; left: -6px; }
+    .xh-m.tr { top: -6px; right: -6px; }
+    .xh-m.bl { bottom: -6px; left: -6px; }
+    .xh-m.br { bottom: -6px; right: -6px; }
+
+    /* Halftone dot ramp — analog degradation, not a gradient */
+    .halftone {
+      background-image: radial-gradient(var(--ink) 1.05px, transparent 1.15px);
+      background-size: 6px 6px;
+      -webkit-mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,.35) 55%, transparent 100%);
+      mask-image: linear-gradient(180deg, #000 0%, rgba(0,0,0,.35) 55%, transparent 100%);
+    }
+
+    /* Hairline grid: parent inks the gaps, children re-paper themselves */
+    .hgrid { display: grid; gap: 1px; background: var(--ink); border: var(--rule); }
+    .hgrid > * { background: var(--paper); }
+
+    /* ==================== MASTHEAD ==================== */
+
+    .masthead {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--paper);
+      border-bottom: var(--rule);
+    }
+    .masthead-in {
+      max-width: 1480px; margin: 0 auto;
+      border-left: var(--rule); border-right: var(--rule);
+      display: flex; align-items: stretch; justify-content: space-between;
+      min-height: 3.25rem;
+    }
+    .wordmark {
+      display: flex; align-items: center; gap: 0.4rem;
+      font-family: var(--display); font-size: 1rem; text-transform: uppercase;
+      letter-spacing: -0.03em; padding: 0 var(--pad); border-right: var(--rule);
+    }
+    .wordmark sup { font-family: var(--mono); font-size: 0.5rem; font-weight: 700; top: -0.7em; }
+
+    /* Fills the compartment between wordmark and index with a live readout */
+    .mast-status {
+      display: flex; align-items: center; gap: 0.6rem;
+      padding: 0 var(--pad); border-right: var(--rule);
+      font-family: var(--mono); font-size: 0.625rem; font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.14em; color: var(--ink-faint);
+      white-space: nowrap; overflow: hidden;
+    }
+    .mast-status .dot { width: 6px; height: 6px; background: var(--red); flex: none; }
+    @media (max-width: 620px) { .mast-status { display: none; } }
+
+    .nav-idx { display: flex; align-items: stretch; margin-left: auto; }
+    .nav-idx a {
+      display: flex; align-items: center; gap: 0.4rem;
+      padding: 0 1rem; border-left: var(--rule);
+      font-family: var(--mono); font-size: 0.625rem; font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.14em;
+      transition: background .12s linear, color .12s linear;
+    }
+    .nav-idx a:hover { background: var(--ink); color: var(--paper); }
+    .nav-idx a:hover .nav-n { color: var(--red); }
+    .nav-n { color: var(--ink-faint); font-weight: 700; }
+    .nav-idx a.is-src { background: var(--red); border-left-color: var(--red); color: var(--paper); }
+    .nav-idx a.is-src:hover { background: var(--ink); border-left-color: var(--ink); }
+    .nav-idx a.is-src:hover .nav-n { color: var(--red); }
+    @media (max-width: 900px) { .nav-hide { display: none !important; } }
+
+    /* ==================== HERO ==================== */
+
+    .hero { padding: clamp(2.5rem, 6vw, 5rem) var(--pad) 0; border-bottom: var(--rule); }
+
+    .hero-meta {
+      display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; align-items: center;
+      margin-bottom: clamp(1.75rem, 4vw, 3rem);
+      color: var(--ink-mute);
+    }
+    .hero-meta .slash { color: var(--red); font-weight: 700; }
+
+    .hero-title { margin-bottom: 0; }
+    .hero-title .ln { display: block; }
+    .hero-title .ln--red { color: var(--red); }
+
+    .hero-split {
+      display: grid; grid-template-columns: 1fr; gap: clamp(1.75rem, 4vw, 3rem);
+      margin-top: clamp(1.75rem, 4vw, 2.75rem);
+      padding-top: 1.5rem; border-top: var(--rule-2); border-top-color: var(--red);
+    }
+    @media (min-width: 900px) { .hero-split { grid-template-columns: minmax(0,1.15fr) minmax(0,1fr); gap: clamp(2rem,5vw,5rem); } }
+
+    /* Spec sheet — <dl> as technical readout */
+    .spec { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 0; align-self: start; }
+    .spec dt, .spec dd {
+      font-family: var(--mono); font-size: 0.6875rem; text-transform: uppercase;
+      letter-spacing: 0.1em; padding: 0.55rem 0; border-bottom: var(--rule-soft); margin: 0;
+    }
+    .spec dt { color: var(--ink-faint); font-weight: 500; padding-right: 2rem; white-space: nowrap; }
+    .spec dd { color: var(--ink); font-weight: 700; text-align: right; }
+
+    /* Install command bar */
+    .cmdbar {
+      display: flex; align-items: stretch; border: var(--rule-2);
+      background: var(--paper); margin-top: 1.75rem; max-width: 34rem;
+    }
+    .cmdbar-sig {
+      display: flex; align-items: center; padding: 0 0.85rem;
+      background: var(--red); color: var(--paper);
+      font-family: var(--mono); font-size: 0.8125rem; font-weight: 700;
+    }
+    .cmdbar code {
+      flex: 1; display: flex; align-items: center; padding: 0.9rem 1rem;
+      font-size: 0.875rem; font-weight: 500; letter-spacing: -0.01em; overflow-x: auto;
+      white-space: nowrap;
+    }
+    .btn-copy {
+      appearance: none; border: 0; border-left: var(--rule-2); background: var(--paper);
+      color: var(--ink); cursor: pointer; padding: 0 1.1rem;
+      font-family: var(--mono); font-size: 0.625rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.14em;
+      transition: background .12s linear, color .12s linear;
+    }
+    .btn-copy:hover { background: var(--ink); color: var(--paper); }
+    .btn-copy[data-done="1"] { background: var(--red); color: var(--paper); border-left-color: var(--red); }
+
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; margin-top: 1rem; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.6rem;
+      padding: 0.85rem 1.4rem; border: var(--rule-2);
+      font-family: var(--mono); font-size: 0.6875rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.14em;
+      transition: background .12s linear, color .12s linear, border-color .12s linear;
+    }
+    .btn--solid { background: var(--ink); color: var(--paper); }
+    .btn--solid:hover { background: var(--red); border-color: var(--red); }
+    .btn--ghost:hover { background: var(--ink); color: var(--paper); }
+    .btn .arw { color: var(--red); }
+    .btn--solid .arw { color: var(--red); }
+    .btn--solid:hover .arw { color: var(--paper); }
+
+    .hero-foot { margin-top: clamp(2rem, 5vw, 3.5rem); height: 74px; }
+
+    /* ==================== HAZARD STRIPE + MARQUEE ==================== */
+
+    .hazard { height: 22px; border-bottom: var(--rule);
+      background: repeating-linear-gradient(45deg, var(--red) 0 11px, var(--paper) 11px 22px); }
+
+    .marquee { overflow: hidden; border-bottom: var(--rule); background: var(--ink); color: var(--paper); }
+    .marquee-track { display: flex; width: max-content; animation: slide 38s linear infinite; }
+    .marquee-track span {
+      font-family: var(--mono); font-size: 0.6875rem; font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.22em;
+      padding: 0.7rem 0; white-space: nowrap;
+    }
+    .marquee-track b { color: var(--red); font-weight: 700; padding: 0 1.5rem; }
+    @keyframes slide { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+    @media (prefers-reduced-motion: reduce) { .marquee-track { animation: none; } }
+
+    /* ==================== INK PANELS (terminal / code) ==================== */
+
+    .panel { border: var(--rule); background: var(--ink); color: var(--on-ink); }
+    .panel-bar {
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+      padding: 0.6rem 1rem; border-bottom: 1px solid #2A2A28;
+      font-family: var(--mono); font-size: 0.625rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.14em; color: var(--on-ink-mute);
+    }
+    .panel-bar .lbl { color: var(--on-ink); }
+    .panel-body { padding: clamp(1rem, 2.5vw, 1.6rem); font-family: var(--mono); font-size: 0.8125rem; line-height: 1.7; overflow-x: auto; }
+
+    .panel .btn-copy { border: 1px solid #2A2A28; background: transparent; color: var(--on-ink-mute); padding: 0.3rem 0.7rem; }
+    .panel .btn-copy:hover { background: var(--red); border-color: var(--red); color: var(--paper); }
+    .panel .btn-copy[data-done="1"] { background: var(--red); border-color: var(--red); color: var(--paper); }
+
+    .ln-cmd { display: flex; gap: 0.6rem; }
+    .ln-cmd .sig { color: var(--red); font-weight: 700; flex: none; }
+    .ln-out { color: var(--on-ink-mute); padding-left: 1.35rem; }
+    .ln-out em { font-style: normal; color: var(--on-ink); font-weight: 500; }
+    .ln-group + .ln-group { margin-top: 0.9rem; }
+    .ln-note { color: #5E5C57; }
+
+    /* scrollbars inside ink panels */
+    .panel-body::-webkit-scrollbar { height: 8px; }
+    .panel-body::-webkit-scrollbar-track { background: #161614; }
+    .panel-body::-webkit-scrollbar-thumb { background: #3A3A36; }
+
+    /* ==================== STATS ==================== */
+
+    /* Downloads cell holds column 1 across both rows; version + license stack in column 2 */
+    .stats { grid-template-columns: 1fr; }
+    @media (min-width: 720px) {
+      .stats { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); }
+      .stat--hero { grid-column: 1; grid-row: 1 / span 2; justify-content: center; }
+    }
+    .stat { padding: clamp(1.5rem, 3.5vw, 2.5rem) var(--pad); display: flex; flex-direction: column; }
+    .stat-n {
+      font-family: var(--display); font-size: clamp(2.4rem, 6.5vw, 4.25rem);
+      line-height: 0.9; letter-spacing: -0.045em; margin: 0 0 0.6rem;
+      font-variant-numeric: tabular-nums;
+    }
+    .stat-n--hero { font-size: clamp(3.5rem, 12.5vw, 9.5rem); line-height: 0.84; margin-bottom: 1rem; }
+    /* mid-scramble the value is unresolved — hold it back until it locks */
+    .stat-n--hero[data-scrambling] { color: var(--red); }
+    .stat-l { color: var(--ink-mute); }
+    .stat-i { color: var(--red); font-weight: 700; display: block; margin-bottom: 0.9rem; }
+
+    /* ==================== FEATURE / FILE CARDS ==================== */
+
+    .cards { grid-template-columns: 1fr; }
+    @media (min-width: 700px) { .cards { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1000px) { .cards { grid-template-columns: repeat(3, 1fr); } }
+
+    .card { padding: clamp(1.5rem, 3vw, 2.25rem); display: flex; flex-direction: column; gap: 0.75rem; transition: background .12s linear; }
+    .card:hover { background: var(--paper-2); }
+    .card-i { display: flex; align-items: center; justify-content: space-between; color: var(--ink-faint); }
+    .card-i b { color: var(--red); font-weight: 700; }
+    .card h3 { margin: 0.4rem 0 0; font-size: 1.0625rem; font-weight: 700; letter-spacing: -0.02em; text-transform: uppercase; }
+    .card p { margin: 0; font-size: 0.875rem; line-height: 1.55; color: var(--ink-mute); }
+    .card-cmds { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: auto; padding-top: 0.75rem; }
+    .chip {
+      font-family: var(--mono); font-size: 0.6875rem; font-weight: 500;
+      border: var(--rule); padding: 0.28rem 0.5rem; background: var(--paper);
+      white-space: nowrap;
+    }
+    .chip--red { border-color: var(--red); color: var(--red); }
+    .card-path { font-family: var(--mono); font-size: 0.75rem; font-weight: 700; color: var(--red); letter-spacing: 0.02em; word-break: break-all; }
+
+    /* ==================== WALKTHROUGH ==================== */
+
+    .steps { margin-top: clamp(1.5rem, 3vw, 2.5rem); }
+    .step { display: grid; grid-template-columns: 1fr; gap: 0.6rem; padding: clamp(1.1rem, 2.4vw, 1.6rem); }
+    @media (min-width: 780px) { .step { grid-template-columns: 8.5rem 1fr; gap: 1.5rem; align-items: start; } }
+    .step-n { font-family: var(--mono); font-size: 0.625rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--ink-faint); }
+    .step-n b { color: var(--red); display: block; font-size: 1.5rem; letter-spacing: -0.02em; line-height: 1; margin-bottom: 0.3rem; font-family: var(--display); font-weight: 400; }
+    .step-cmd { font-family: var(--mono); font-size: 0.8125rem; font-weight: 500; display: block; }
+    .step-cmd .sig { color: var(--red); font-weight: 700; margin-right: 0.5rem; }
+    .step-r { font-family: var(--mono); font-size: 0.75rem; color: var(--ink-mute); display: block; margin-top: 0.35rem; }
+    .step-r::before { content: '→ '; color: var(--red); }
+
+    /* ==================== COMMAND TABLE ==================== */
+
+    .tbl-wrap { border: var(--rule); overflow-x: auto; }
+    table.cmdtbl { width: 100%; border-collapse: collapse; min-width: 640px; }
+    .cmdtbl th {
+      text-align: left; font-family: var(--mono); font-size: 0.5625rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.18em; color: var(--paper);
+      background: var(--ink); padding: 0.7rem 1rem; white-space: nowrap;
+    }
+    .cmdtbl td { border-top: var(--rule-soft); padding: 0.85rem 1rem; vertical-align: top; }
+    .cmdtbl tbody tr:hover { background: var(--paper-2); }
+    .cmdtbl .t-i { font-family: var(--mono); font-size: 0.6875rem; font-weight: 700; color: var(--ink-faint); width: 3.5rem; }
+    .cmdtbl tbody tr:hover .t-i { color: var(--red); }
+    .cmdtbl .t-c { font-family: var(--mono); font-size: 0.8125rem; font-weight: 700; white-space: nowrap; width: 1%; }
+    .cmdtbl .t-d { font-size: 0.875rem; line-height: 1.5; color: var(--ink-mute); }
+
+    /* ==================== CHANGELOG ==================== */
+
+    .rel { border-top: var(--rule-2); }
+    .rel + .rel { margin-top: clamp(2rem, 4vw, 3rem); }
+    .rel-head { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 1rem; padding: 0.9rem 0 1.1rem; }
+    .rel-v { font-family: var(--display); font-size: clamp(1.5rem, 3.4vw, 2.25rem); letter-spacing: -0.04em; line-height: 1; text-transform: uppercase; }
+    .rel-d { font-family: var(--mono); font-size: 0.6875rem; letter-spacing: 0.12em; color: var(--ink-faint); text-transform: uppercase; }
+    .rel-badge {
+      font-family: var(--mono); font-size: 0.5625rem; font-weight: 700; letter-spacing: 0.18em;
+      text-transform: uppercase; padding: 0.35rem 0.6rem; margin-left: auto;
+      background: var(--red); color: var(--paper);
+    }
+    .rel-badge--out { background: var(--paper); color: var(--ink); border: var(--rule); }
+
+    .entry { display: grid; grid-template-columns: 1fr; gap: 0.5rem; padding: clamp(1rem, 2.2vw, 1.4rem); }
+    @media (min-width: 720px) { .entry { grid-template-columns: 5rem 1fr; gap: 1.25rem; align-items: start; } }
+    .entry-t {
+      font-family: var(--mono); font-size: 0.5625rem; font-weight: 700; letter-spacing: 0.18em;
+      text-transform: uppercase; border: var(--rule); padding: 0.25rem 0; text-align: center;
+      justify-self: start; min-width: 3.4rem;
+    }
+    .entry-t--fix { border-color: var(--red); color: var(--red); }
+    .entry-t--feat { background: var(--ink); color: var(--paper); }
+    .entry h4 { margin: 0 0 0.35rem; font-size: 0.9375rem; font-weight: 700; letter-spacing: -0.015em; line-height: 1.35; }
+    .entry p { margin: 0; font-size: 0.8125rem; line-height: 1.55; color: var(--ink-mute); }
+
+    /* ==================== FOOTER ==================== */
+
+    .foot { background: var(--ink); color: var(--on-ink); }
+    .foot-in { max-width: 1480px; margin: 0 auto; border-left: var(--rule); border-right: var(--rule); }
+    .foot-mark { padding: clamp(2rem, 5vw, 3.5rem) var(--pad) clamp(1.5rem, 3vw, 2rem); border-bottom: 1px solid #2A2A28; }
+    .foot-mark .macro { font-size: clamp(3.5rem, 17vw, 14rem); color: var(--on-ink); }
+    .foot-mark .macro sup { font-family: var(--mono); font-size: 0.14em; font-weight: 700; color: var(--red); top: -1.9em; letter-spacing: 0; }
+    .foot-grid { display: grid; grid-template-columns: 1fr; }
+    @media (min-width: 780px) { .foot-grid { grid-template-columns: 1.4fr 1fr; } }
+    .foot-cell { padding: clamp(1.4rem, 3vw, 2rem) var(--pad); }
+    .foot-cell + .foot-cell { border-top: 1px solid #2A2A28; }
+    @media (min-width: 780px) { .foot-cell + .foot-cell { border-top: 0; border-left: 1px solid #2A2A28; } }
+    .foot-links { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .foot-links a {
+      font-family: var(--mono); font-size: 0.625rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.14em;
+      border: 1px solid #2A2A28; padding: 0.55rem 0.9rem;
+      transition: background .12s linear, color .12s linear, border-color .12s linear;
+    }
+    .foot-links a:hover { background: var(--red); border-color: var(--red); color: var(--paper); }
+    .foot-note { font-family: var(--mono); font-size: 0.625rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--on-ink-mute); line-height: 1.8; }
+    .foot-note .c-red { color: var(--red); }
   </style>
 </head>
-<body class="min-h-screen flex flex-col relative overflow-x-hidden selection:bg-[#58a6ff] selection:text-white">
+<body>
 
-  <!-- Background Effects -->
-  <div class="fixed inset-0 pointer-events-none hero-glow z-0"></div>
-  <div class="fixed top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#30363d] to-transparent z-10"></div>
-
-  <!-- Navbar -->
-  <nav class="relative z-50 w-full max-w-6xl mx-auto px-6 py-6 flex justify-between items-center">
-    <div class="flex items-center gap-2 group cursor-default">
-      <span class="text-sm font-semibold tracking-tight text-white">GiMan</span>
+<!-- ============================ MASTHEAD ============================ -->
+<header class="masthead">
+  <div class="masthead-in">
+    <a class="wordmark" href="#top">GiMan<sup>®</sup></a>
+    <div class="mast-status" aria-hidden="true">
+      <span class="dot"></span>
+      <span>Rev 1.0.4</span>
+      <span>·</span>
+      <span>MIT</span>
+      <span>·</span>
+      <span>Node ≥ 18</span>
     </div>
-    <div class="flex items-center gap-4">
-      <a href="https://github.com/Lokesh-Kumar-Dudi/giman" target="_blank" rel="noopener" class="text-xs font-medium text-[#8b949e] hover:text-white transition-colors flex items-center gap-1.5">
-        <iconify-icon icon="solar:brand-github-linear" width="16"></iconify-icon>
-        GitHub
-      </a>
-    </div>
-  </nav>
+    <nav class="nav-idx" aria-label="Section index">
+      <a class="nav-hide" href="#capabilities"><span class="nav-n">01</span> Capabilities</a>
+      <a class="nav-hide" href="#how-it-works"><span class="nav-n">02</span> Mechanism</a>
+      <a href="#commands"><span class="nav-n">03</span> Commands</a>
+      <a class="nav-hide" href="#changelog"><span class="nav-n">04</span> Changelog</a>
+      <a class="is-src" href="https://github.com/Lokesh-Kumar-Dudi/giman" target="_blank" rel="noopener">Source ↗</a>
+    </nav>
+  </div>
+</header>
 
-  <!-- Hero Section -->
-  <main class="relative z-10 flex-grow flex flex-col items-center justify-center pt-12 pb-20 px-6">
-    
-    <!-- Hero Text -->
-    <div class="text-center max-w-2xl mx-auto mb-12 space-y-6">
-      <h1 class="text-4xl md:text-6xl font-semibold tracking-tight text-white leading-[1.1]">
-        Git identities, <br/>
-        <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#58a6ff] to-[#3fb950]">managed.</span>
-      </h1>
-      
-      <p class="text-base md:text-lg text-[#8b949e] leading-relaxed max-w-2xl mx-auto">
-        Switch between personal and work GitHub accounts seamlessly. <br/> Map directories to identities and forget about SSH config headaches.
-      </p>
+<div class="frame" id="top">
 
-      <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
-        <div class="flex items-center bg-[#161b22] border border-[#30363d] rounded-md pl-4 pr-1 py-1 group focus-within:border-[#58a6ff] transition-all">
-          <span class="text-[#8b949e] select-none font-mono text-xs mr-2">$</span>
-          <code class="font-mono text-sm text-[#e6edf3] outline-none bg-transparent">npm install -g giman</code>
-          <button onclick="navigator.clipboard.writeText('npm install -g giman')" class="ml-3 p-1.5 rounded hover:bg-[#21262d] text-[#8b949e] hover:text-white transition-colors" title="Copy">
-             <iconify-icon icon="solar:copy-linear" width="16"></iconify-icon>
-          </button>
+  <!-- ============================ HERO ============================ -->
+  <section class="hero">
+    <p class="mono hero-meta" style="margin:0 0 clamp(1.75rem,4vw,3rem)">
+      <span>Unit / D-01</span>
+      <span class="slash">///</span>
+      <span>SSH git Identity Control</span>
+      <span class="slash">///</span>
+      <span>Rev 1.0.4</span>
+      <span class="slash">///</span>
+      <span>Node ≥ 18</span>
+    </p>
+
+    <h1 class="macro macro--xl hero-title">
+      <span class="ln">Git</span>
+      <span class="ln">Identities,</span>
+      <span class="ln ln--red">Managed.</span>
+    </h1>
+
+    <div class="hero-split">
+      <div>
+        <p class="prose">
+          Personal and work GitHub accounts on one machine, without the SSH config
+          archaeology. Map a directory to an identity once — <strong>every repo inside it
+          commits, clones, and authenticates as the right user</strong>, permanently.
+        </p>
+
+        <div class="cmdbar">
+          <span class="cmdbar-sig" aria-hidden="true">$</span>
+          <code id="install-cmd">npm install -g giman</code>
+          <button class="btn-copy" data-copy="install-cmd" type="button">Copy</button>
         </div>
-        <a href="#quick-start" class="px-5 py-2.5 rounded-md bg-[#3fb950] hover:bg-[#3fb950]/90 text-white text-sm font-medium transition-all shadow-[0_0_15px_rgba(63,185,80,0.3)] hover:shadow-[0_0_25px_rgba(63,185,80,0.5)]">
-          Get Started
-        </a>
-      </div>
-    </div>
 
-    <!-- Terminal Visual -->
-    <div class="w-full max-w-3xl mx-auto animate-[fadeIn_1s_ease-out]">
-      <div class="rounded-xl border border-[#30363d] bg-[#0d1117] overflow-hidden shadow-2xl shadow-black/50">
-        <!-- Terminal Header -->
-        <div class="bg-[#161b22] px-4 py-3 flex items-center justify-between border-b border-[#30363d]">
-          <div class="flex gap-2">
-            <div class="window-control bg-[#ff5f56]"></div>
-            <div class="window-control bg-[#ffbd2e]"></div>
-            <div class="window-control bg-[#27c93f]"></div>
-          </div>
-          <div class="text-xs text-[#8b949e] font-mono">bash — gid</div>
-          <div class="w-10"></div> <!-- spacer -->
-        </div>
-        <!-- Terminal Body -->
-        <div class="p-6 font-mono text-sm overflow-x-auto">
-          <div class="flex flex-col gap-2">
-            <!-- Line 1 -->
-            <div class="flex">
-              <span class="text-[#3fb950] mr-2">➜</span>
-              <span class="text-[#58a6ff] mr-2">~</span>
-              <span class="text-[#e6edf3]">gid init</span>
-            </div>
-            <div class="text-[#8b949e] pl-6 pb-2">Initializing GiMan configuration... Done.</div>
-            
-            <!-- Line 2 -->
-            <div class="flex">
-              <span class="text-[#3fb950] mr-2">➜</span>
-              <span class="text-[#58a6ff] mr-2">~</span>
-              <span class="text-[#e6edf3]">gid dir add ~/dev/personal --identity personal</span>
-            </div>
-             <div class="text-[#8b949e] pl-6 pb-2">Directory mapped: <span class="text-[#e6edf3]">~/dev/personal</span> → <span class="text-[#58a6ff]">personal</span></div>
-
-            <!-- Line 3 -->
-            <div class="flex">
-              <span class="text-[#3fb950] mr-2">➜</span>
-              <span class="text-[#58a6ff] mr-2">~</span>
-              <span class="text-[#e6edf3]">gid dir add ~/dev/work --identity work</span>
-            </div>
-            <div class="text-[#8b949e] pl-6 pb-2">Directory mapped: <span class="text-[#e6edf3]">~/dev/work</span> → <span class="text-[#3fb950]">work</span></div>
-
-            <!-- Line 4 -->
-            <div class="flex">
-              <span class="text-[#3fb950] mr-2">➜</span>
-              <span class="text-[#58a6ff] mr-2">~</span>
-              <span class="text-[#e6edf3]">git clone git@github.com:company/project.git</span>
-            </div>
-            <div class="text-[#8b949e] pl-6">
-              Using identity: <span class="text-[#3fb950]">work</span><br/>
-              Cloning into 'project'...
-            </div>
-          </div>
+        <div class="hero-actions">
+          <a class="btn btn--solid" href="#how-it-works">Read the mechanism <span class="arw">→</span></a>
+          <a class="btn btn--ghost" href="https://github.com/Lokesh-Kumar-Dudi/giman" target="_blank" rel="noopener">GitHub <span class="arw">↗</span></a>
         </div>
       </div>
-    </div>
-  </main>
 
-  <!-- Downloads counter strip -->
-  <div class="relative z-10 w-full max-w-5xl mx-auto px-6 py-10">
-    <div class="rounded-xl border border-[#30363d] bg-[#161b22]/60 backdrop-blur-sm px-8 py-8 flex flex-col sm:flex-row items-center justify-center gap-8 sm:gap-16">
-      <div class="text-center">
-        <p class="text-4xl md:text-5xl font-semibold font-mono text-white tracking-tight tabular-nums" id="counter-downloads">—</p>
-        <p class="text-xs text-[#8b949e] mt-2 tracking-wide">total npm downloads</p>
-      </div>
-      <div class="hidden sm:block w-px h-12 bg-[#30363d]"></div>
-      <div class="text-center">
-        <p class="text-4xl md:text-5xl font-semibold font-mono text-white tracking-tight">v1.0.4</p>
-        <p class="text-xs text-[#8b949e] mt-2 tracking-wide">latest version</p>
-      </div>
-      <div class="hidden sm:block w-px h-12 bg-[#30363d]"></div>
-      <div class="text-center">
-        <p class="text-4xl md:text-5xl font-semibold font-mono text-white tracking-tight">MIT</p>
-        <p class="text-xs text-[#8b949e] mt-2 tracking-wide">license</p>
-      </div>
+      <dl class="spec">
+        <dt>Package</dt>       <dd>giman</dd>
+        <dt>Binary</dt>        <dd>gid</dd>
+        <dt>Version</dt>       <dd>1.0.4</dd>
+        <dt>Runtime</dt>       <dd>Node ≥ 18</dd>
+        <dt>Transport</dt>     <dd>SSH</dd>
+        <dt>Files touched</dt> <dd>03</dd>
+        <dt>Reversible</dt>    <dd class="c-red">Yes</dd>
+        <dt>License</dt>       <dd>MIT</dd>
+      </dl>
+    </div>
+
+    <div class="hero-foot halftone" aria-hidden="true"></div>
+  </section>
+
+  <!-- ============================ HAZARD + MARQUEE ============================ -->
+  <div class="hazard" aria-hidden="true"></div>
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track">
+      <span>One machine <b>///</b> Multiple identities <b>///</b> Zero config archaeology <b>///</b> Directory-scoped SSH keys <b>///</b> Reversible by design <b>///</b> One machine <b>///</b> Multiple identities <b>///</b> Zero config archaeology <b>///</b> Directory-scoped SSH keys <b>///</b> Reversible by design <b>///</b> </span>
+      <span>One machine <b>///</b> Multiple identities <b>///</b> Zero config archaeology <b>///</b> Directory-scoped SSH keys <b>///</b> Reversible by design <b>///</b> One machine <b>///</b> Multiple identities <b>///</b> Zero config archaeology <b>///</b> Directory-scoped SSH keys <b>///</b> Reversible by design <b>///</b> </span>
     </div>
   </div>
 
-  <!-- Features Grid -->
-  <section class="relative z-10 w-full max-w-5xl mx-auto px-6 py-20 border-t border-[#30363d]/50" id="quick-start">
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      
-      <!-- Feature 1 -->
-      <div class="p-6 rounded-lg bg-[#161b22] border border-[#30363d] hover:border-[#58a6ff]/50 transition-colors group">
-        <div class="w-10 h-10 rounded-full bg-[#21262d] flex items-center justify-center text-[#58a6ff] mb-4 group-hover:bg-[#58a6ff]/10">
-          <iconify-icon icon="solar:bolt-linear" width="20"></iconify-icon>
-        </div>
-        <h3 class="text-base font-semibold text-white mb-2 tracking-tight">Quick Setup</h3>
-        <p class="text-sm text-[#8b949e] mb-4">Initialize with a single command. No complex config files to edit manually.</p>
-        <code class="text-xs bg-[#0d1117] border border-[#30363d] px-2 py-1 rounded text-[#e6edf3] font-mono">gid init</code>
-      </div>
+  <!-- ============================ SESSION LOG ============================ -->
+  <section class="sec">
+    <div class="sec-head">
+      <span class="sec-tag sec-tag--red">00 / Session Log</span>
+      <span class="sec-rule" aria-hidden="true"></span>
+      <span class="mono c-faint">Transcript — verbatim</span>
+    </div>
 
-      <!-- Feature 2 -->
-      <div class="p-6 rounded-lg bg-[#161b22] border border-[#30363d] hover:border-[#3fb950]/50 transition-colors group">
-        <div class="w-10 h-10 rounded-full bg-[#21262d] flex items-center justify-center text-[#3fb950] mb-4 group-hover:bg-[#3fb950]/10">
-          <iconify-icon icon="solar:folder-with-files-linear" width="20"></iconify-icon>
-        </div>
-        <h3 class="text-base font-semibold text-white mb-2 tracking-tight">Context Aware</h3>
-        <p class="text-sm text-[#8b949e] mb-4">Automatically switches SSH keys based on the directory you are working in.</p>
-        <code class="text-xs bg-[#0d1117] border border-[#30363d] px-2 py-1 rounded text-[#e6edf3] font-mono">gid dir add &lt;path&gt;</code>
-      </div>
+    <div class="panel xh">
+      <span class="xh-m tl" aria-hidden="true"></span>
+      <span class="xh-m tr" aria-hidden="true"></span>
+      <span class="xh-m bl" aria-hidden="true"></span>
+      <span class="xh-m br" aria-hidden="true"></span>
 
-      <!-- Feature 3 -->
-      <div class="p-6 rounded-lg bg-[#161b22] border border-[#30363d] hover:border-[#a371f7]/50 transition-colors group md:col-span-2 lg:col-span-1">
-        <div class="w-10 h-10 rounded-full bg-[#21262d] flex items-center justify-center text-[#a371f7] mb-4 group-hover:bg-[#a371f7]/10">
-          <iconify-icon icon="solar:command-linear" width="20"></iconify-icon>
+      <div class="panel-bar">
+        <span class="lbl">[ Bash — gid ]</span>
+        <span>TTY / 001 &nbsp;·&nbsp; Exit 0</span>
+      </div>
+      <div class="panel-body">
+        <div class="ln-group">
+          <div class="ln-cmd"><span class="sig">$</span><samp>gid init</samp></div>
+          <div class="ln-out">Initializing GiMan configuration… <em>Done.</em></div>
         </div>
-        <h3 class="text-base font-semibold text-white mb-2 tracking-tight">Full Control</h3>
-        <p class="text-sm text-[#8b949e] mb-4">Manage identities, list status, and apply changes instantly from the terminal.</p>
-        <div class="flex gap-2 flex-wrap">
-          <code class="text-xs bg-[#0d1117] border border-[#30363d] px-2 py-1 rounded text-[#e6edf3] font-mono">gid status</code>
-          <code class="text-xs bg-[#0d1117] border border-[#30363d] px-2 py-1 rounded text-[#e6edf3] font-mono">gid identity list</code>
+        <div class="ln-group">
+          <div class="ln-cmd"><span class="sig">$</span><samp>gid dir add ~/dev/personal --identity personal</samp></div>
+          <div class="ln-out">Directory mapped: <em>~/dev/personal</em> → <em>personal</em></div>
+        </div>
+        <div class="ln-group">
+          <div class="ln-cmd"><span class="sig">$</span><samp>gid dir add ~/dev/work --identity work</samp></div>
+          <div class="ln-out">Directory mapped: <em>~/dev/work</em> → <em>work</em></div>
+        </div>
+        <div class="ln-group">
+          <div class="ln-cmd"><span class="sig">$</span><samp>gid clone git@github.com:company/project.git</samp></div>
+          <div class="ln-out">Using identity: <em>work</em></div>
+          <div class="ln-out">Rewriting host → <em>github-work</em></div>
+          <div class="ln-out">Cloning into 'project'…</div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- How it works section -->
-  <section class="relative z-10 w-full max-w-5xl mx-auto px-6 pb-20" id="how-it-works">
-    <h2 class="text-2xl font-semibold text-white mb-2 tracking-tight">How it works</h2>
-    <p class="text-sm text-[#8b949e] mb-10">GiMan manages three system files on your behalf — all changes are reversible and opt-in.</p>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-      <div class="p-5 rounded-lg bg-[#161b22] border border-[#30363d]">
-        <p class="text-xs font-mono text-[#58a6ff] mb-2">~/.giman/config.json</p>
-        <p class="text-sm text-[#8b949e]">Source of truth. Stores identities, SSH key paths, and directory mappings. Edit manually or use <code class="text-[#e6edf3]">gid identity</code> commands.</p>
+  <!-- ============================ STATS ============================ -->
+  <section class="sec sec--flush">
+    <div class="hgrid stats" style="border:0;border-bottom:0">
+      <div class="stat stat--hero">
+        <span class="mono mono--sm stat-i">[ 001 ]</span>
+        <p class="stat-n stat-n--hero tnum" id="counter-downloads">—</p>
+        <p class="mono mono--sm stat-l">Total npm downloads</p>
       </div>
-      <div class="p-5 rounded-lg bg-[#161b22] border border-[#30363d]">
-        <p class="text-xs font-mono text-[#3fb950] mb-2">~/.gitconfig</p>
-        <p class="text-sm text-[#8b949e]">GiMan appends <code class="text-[#e6edf3]">includeIf "gitdir:..."</code> blocks that activate per-identity gitconfigs for specific directories automatically.</p>
+      <div class="stat">
+        <span class="mono mono--sm stat-i">[ 002 ]</span>
+        <p class="stat-n">1.0.4</p>
+        <p class="mono mono--sm stat-l">Latest version</p>
       </div>
-      <div class="p-5 rounded-lg bg-[#161b22] border border-[#30363d]">
-        <p class="text-xs font-mono text-[#a371f7] mb-2">~/.ssh/config</p>
-        <p class="text-sm text-[#8b949e]">GiMan writes <code class="text-[#e6edf3]">Host alias</code> blocks (e.g. <code class="text-[#e6edf3]">github-personal</code>) that map to <code class="text-[#e6edf3]">github.com</code> with your specific SSH key.</p>
+      <div class="stat">
+        <span class="mono mono--sm stat-i">[ 003 ]</span>
+        <p class="stat-n">MIT</p>
+        <p class="mono mono--sm stat-l">License</p>
       </div>
     </div>
-    <div class="rounded-lg bg-[#0d1117] border border-[#30363d] overflow-hidden">
-      <div class="bg-[#161b22] px-4 py-2.5 border-b border-[#30363d] flex items-center gap-2">
-        <span class="text-xs text-[#8b949e] font-mono">Complete quick-start walkthrough</span>
+  </section>
+
+  <!-- ============================ CAPABILITIES ============================ -->
+  <section class="sec" id="capabilities">
+    <div class="sec-head">
+      <span class="sec-tag">01 / Capabilities</span>
+      <span class="sec-rule" aria-hidden="true"></span>
+      <span class="mono c-faint">Three primitives</span>
+    </div>
+    <h2 class="macro macro--l">Set it once.<br>Never think<br>about it again.</h2>
+    <p class="prose sec-lede">
+      GiMan is a thin, auditable layer over primitives Git and SSH already have.
+      It writes plain text you can read, and unwrites it just as cleanly.
+    </p>
+
+    <div class="hgrid cards">
+      <article class="card">
+        <div class="card-i mono mono--sm"><b>01</b><span>Setup</span></div>
+        <h3>Quick setup</h3>
+        <p>Initialize with a single command. No config files to hand-edit, no key paths to memorize.</p>
+        <div class="card-cmds"><code class="chip chip--red">gid init</code></div>
+      </article>
+
+      <article class="card">
+        <div class="card-i mono mono--sm"><b>02</b><span>Routing</span></div>
+        <h3>Context aware</h3>
+        <p>Switches SSH keys and commit identity based on the directory you're working in. No shell hooks, no aliases.</p>
+        <div class="card-cmds"><code class="chip chip--red">gid dir add &lt;path&gt;</code></div>
+      </article>
+
+      <article class="card">
+        <div class="card-i mono mono--sm"><b>03</b><span>Control</span></div>
+        <h3>Full control</h3>
+        <p>Inspect, edit, and apply from the terminal. Every write is marked and reversible.</p>
+        <div class="card-cmds">
+          <code class="chip">gid status</code>
+          <code class="chip">gid id list</code>
+          <code class="chip">gid apply</code>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ============================ MECHANISM ============================ -->
+  <section class="sec" id="how-it-works">
+    <div class="sec-head">
+      <span class="sec-tag">02 / Mechanism</span>
+      <span class="sec-rule" aria-hidden="true"></span>
+      <span class="mono c-faint">Three files — all reversible</span>
+    </div>
+    <h2 class="macro macro--l">How it works</h2>
+    <p class="prose sec-lede">
+      GiMan manages exactly three files on your behalf. Every change is opt-in, marked,
+      and safe to re-run.
+    </p>
+
+    <div class="hgrid cards">
+      <article class="card">
+        <div class="card-i mono mono--sm"><b>F-01</b><span>Source of truth</span></div>
+        <p class="card-path">~/.giman/config.json</p>
+        <p>Stores identities, SSH key paths, and directory mappings. Edit it by hand or drive it with <code class="ic">gid id</code> commands.</p>
+      </article>
+      <article class="card">
+        <div class="card-i mono mono--sm"><b>F-02</b><span>Commit identity</span></div>
+        <p class="card-path">~/.gitconfig</p>
+        <p>GiMan appends <code class="ic">includeIf "gitdir:…"</code> blocks that activate a per-identity gitconfig for specific directories automatically.</p>
+      </article>
+      <article class="card">
+        <div class="card-i mono mono--sm"><b>F-03</b><span>Key selection</span></div>
+        <p class="card-path">~/.ssh/config</p>
+        <p>GiMan writes <code class="ic">Host</code> alias blocks — e.g. <code class="ic">github-personal</code> — mapping to <code class="ic">github.com</code> with the matching SSH key.</p>
+      </article>
+    </div>
+
+    <!-- Walkthrough -->
+    <div class="sec-head" style="margin-top:clamp(3rem,6vw,4.5rem)">
+      <span class="sec-tag sec-tag--red">02.1 / Quick start</span>
+      <span class="sec-rule" aria-hidden="true"></span>
+      <span class="mono c-faint">Seven steps — cold machine to first commit</span>
+    </div>
+
+    <div class="hgrid steps" id="quick-start">
+      <div class="step">
+        <div class="step-n"><b>01</b>Install</div>
+        <div>
+          <samp class="step-cmd"><span class="sig">$</span>npm install -g giman</samp>
+        </div>
       </div>
-      <div class="p-6 font-mono text-xs overflow-x-auto space-y-4">
+      <div class="step">
+        <div class="step-n"><b>02</b>First identity</div>
         <div>
-          <div class="text-[#8b949e] mb-1"># 1. Install</div>
-          <div class="text-[#e6edf3]"><span class="text-[#3fb950]">$</span> npm install -g giman</div>
+          <samp class="step-cmd"><span class="sig">$</span>gid init</samp>
+          <span class="step-r">Enter ID (e.g. "personal"), name, email, SSH host alias (e.g. "github-personal")</span>
+          <span class="step-r">Generate a new SSH key or select an existing one</span>
         </div>
+      </div>
+      <div class="step">
+        <div class="step-n"><b>03</b>Second identity</div>
         <div>
-          <div class="text-[#8b949e] mb-1"># 2. Set up first identity (interactive)</div>
-          <div class="text-[#e6edf3]"><span class="text-[#3fb950]">$</span> gid init</div>
-          <div class="text-[#8b949e] pl-3 mt-1">→ Enter ID (e.g. "personal"), name, email, SSH host alias (e.g. "github-personal")</div>
-          <div class="text-[#8b949e] pl-3">→ Generate or select an existing SSH key</div>
+          <samp class="step-cmd"><span class="sig">$</span>gid id add</samp>
+          <span class="step-r">Repeat for the "work" identity</span>
         </div>
+      </div>
+      <div class="step">
+        <div class="step-n"><b>04</b>Map directories</div>
         <div>
-          <div class="text-[#8b949e] mb-1"># 3. Add a second identity</div>
-          <div class="text-[#e6edf3]"><span class="text-[#3fb950]">$</span> gid identity add</div>
-          <div class="text-[#8b949e] pl-3 mt-1">→ Repeat for "work" identity</div>
+          <samp class="step-cmd"><span class="sig">$</span>gid dir add ~/dev/personal --identity personal</samp>
+          <samp class="step-cmd"><span class="sig">$</span>gid dir add ~/dev/work --identity work</samp>
         </div>
+      </div>
+      <div class="step">
+        <div class="step-n"><b>05</b>Verify</div>
         <div>
-          <div class="text-[#8b949e] mb-1"># 4. Map directories</div>
-          <div class="text-[#e6edf3]"><span class="text-[#3fb950]">$</span> gid dir add ~/dev/personal --identity personal</div>
-          <div class="text-[#e6edf3]"><span class="text-[#3fb950]">$</span> gid dir add ~/dev/work --identity work</div>
+          <samp class="step-cmd"><span class="sig">$</span>cd ~/dev/work/my-project</samp>
+          <samp class="step-cmd"><span class="sig">$</span>gid status</samp>
+          <span class="step-r">Identity: work — Jane Work &lt;jane@company.com&gt;</span>
         </div>
+      </div>
+      <div class="step">
+        <div class="step-n"><b>06</b>Clone</div>
         <div>
-          <div class="text-[#8b949e] mb-1"># 5. Check it works</div>
-          <div class="text-[#e6edf3]"><span class="text-[#3fb950]">$</span> cd ~/dev/work/my-project</div>
-          <div class="text-[#e6edf3]"><span class="text-[#3fb950]">$</span> gid status</div>
-          <div class="text-[#8b949e] pl-3 mt-1">✓ Identity: work — Jane Work &lt;jane@company.com&gt;</div>
+          <samp class="step-cmd"><span class="sig">$</span>gid clone git@github.com:company/project.git</samp>
+          <span class="step-r">Prompts to pick an identity, then clones with the rewritten URL</span>
         </div>
+      </div>
+      <div class="step">
+        <div class="step-n"><b>07</b>Commit</div>
         <div>
-          <div class="text-[#8b949e] mb-1"># 6. Clone using the right identity</div>
-          <div class="text-[#e6edf3]"><span class="text-[#3fb950]">$</span> gid clone git@github.com:company/project.git</div>
-          <div class="text-[#8b949e] pl-3 mt-1">→ Prompts to pick identity, then clones with rewritten URL</div>
-        </div>
-        <div>
-          <div class="text-[#8b949e] mb-1"># 7. Commits use the right identity automatically</div>
-          <div class="text-[#e6edf3]"><span class="text-[#3fb950]">$</span> git commit -m "feat: add feature"</div>
-          <div class="text-[#8b949e] pl-3 mt-1">Committed as: Jane Work &lt;jane@company.com&gt;</div>
+          <samp class="step-cmd"><span class="sig">$</span>git commit -m "feat: add feature"</samp>
+          <span class="step-r">Committed as: Jane Work &lt;jane@company.com&gt;</span>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Commands Reference section -->
-  <section class="relative z-10 w-full max-w-5xl mx-auto px-6 pb-20 border-t border-[#30363d]/50 pt-16" id="commands">
-    <h2 class="text-2xl font-semibold text-white mb-2 tracking-tight">Commands</h2>
-    <p class="text-sm text-[#8b949e] mb-8">All commands are prefixed with <code class="text-[#e6edf3] bg-[#161b22] px-1.5 py-0.5 rounded border border-[#30363d]">gid</code>.</p>
-    <div class="space-y-2">
-      <!-- Command rows -->
-      <div class="grid grid-cols-[auto_1fr] gap-4 items-start p-4 rounded-lg bg-[#161b22] border border-[#30363d]">
-        <code class="text-xs font-mono text-[#58a6ff] whitespace-nowrap">gid init</code>
-        <p class="text-sm text-[#8b949e]">Interactive first-time setup. Detects existing config and offers to re-apply it. Run once per machine.</p>
-      </div>
-      <div class="grid grid-cols-[auto_1fr] gap-4 items-start p-4 rounded-lg bg-[#161b22] border border-[#30363d]">
-        <code class="text-xs font-mono text-[#58a6ff] whitespace-nowrap">gid status</code>
-        <p class="text-sm text-[#8b949e]">Show which identity is active for the current directory. No arguments needed.</p>
-      </div>
-      <div class="grid grid-cols-[auto_1fr] gap-4 items-start p-4 rounded-lg bg-[#161b22] border border-[#30363d]">
-        <code class="text-xs font-mono text-[#58a6ff] whitespace-nowrap">gid apply</code>
-        <p class="text-sm text-[#8b949e]">Sync config to system files: rewrites <code class="text-[#e6edf3]">~/.ssh/config</code> and <code class="text-[#e6edf3]">~/.gitconfig</code>. Run after manual config edits.</p>
-      </div>
-      <div class="grid grid-cols-[auto_1fr] gap-4 items-start p-4 rounded-lg bg-[#161b22] border border-[#30363d]">
-        <code class="text-xs font-mono text-[#58a6ff] whitespace-nowrap">gid clone &lt;url&gt; [dir]</code>
-        <p class="text-sm text-[#8b949e]">Clone a repo via SSH. Prompts to select an identity and rewrites the URL to use that identity's host alias.</p>
-      </div>
-      <div class="grid grid-cols-[auto_1fr] gap-4 items-start p-4 rounded-lg bg-[#161b22] border border-[#30363d]">
-        <code class="text-xs font-mono text-[#58a6ff] whitespace-nowrap">gid identity list</code>
-        <p class="text-sm text-[#8b949e]">List all identities with their SSH key, host alias, and mapped directories.</p>
-      </div>
-      <div class="grid grid-cols-[auto_1fr] gap-4 items-start p-4 rounded-lg bg-[#161b22] border border-[#30363d]">
-        <code class="text-xs font-mono text-[#58a6ff] whitespace-nowrap">gid identity add</code>
-        <p class="text-sm text-[#8b949e]">Add a new identity interactively (ID, name, email, SSH key, host alias).</p>
-      </div>
-      <div class="grid grid-cols-[auto_1fr] gap-4 items-start p-4 rounded-lg bg-[#161b22] border border-[#30363d]">
-        <code class="text-xs font-mono text-[#58a6ff] whitespace-nowrap">gid identity edit &lt;id&gt;</code>
-        <p class="text-sm text-[#8b949e]">Edit name, email, or SSH host alias for an identity. Run <code class="text-[#e6edf3]">gid apply</code> afterwards to sync SSH config.</p>
-      </div>
-      <div class="grid grid-cols-[auto_1fr] gap-4 items-start p-4 rounded-lg bg-[#161b22] border border-[#30363d]">
-        <code class="text-xs font-mono text-[#58a6ff] whitespace-nowrap">gid identity remove &lt;id&gt;</code>
-        <p class="text-sm text-[#8b949e]">Remove an identity, its SSH Host block, and all its gitconfig includeIf entries from <code class="text-[#e6edf3]">~/.gitconfig</code>.</p>
-      </div>
-      <div class="grid grid-cols-[auto_1fr] gap-4 items-start p-4 rounded-lg bg-[#161b22] border border-[#30363d]">
-        <code class="text-xs font-mono text-[#58a6ff] whitespace-nowrap">gid identity show &lt;id&gt;</code>
-        <p class="text-sm text-[#8b949e]">Show all details for one identity including mapped directories.</p>
-      </div>
-      <div class="grid grid-cols-[auto_1fr] gap-4 items-start p-4 rounded-lg bg-[#161b22] border border-[#30363d]">
-        <code class="text-xs font-mono text-[#58a6ff] whitespace-nowrap">gid dir add &lt;path&gt; -i &lt;id&gt;</code>
-        <p class="text-sm text-[#8b949e]">Map a directory to an identity. Any repo inside that path uses the identity's user and SSH key automatically.</p>
-      </div>
-      <div class="grid grid-cols-[auto_1fr] gap-4 items-start p-4 rounded-lg bg-[#161b22] border border-[#30363d]">
-        <code class="text-xs font-mono text-[#58a6ff] whitespace-nowrap">gid dir remove &lt;path&gt;</code>
-        <p class="text-sm text-[#8b949e]">Remove a directory mapping. Git will stop auto-selecting the identity for that folder.</p>
-      </div>
-      <div class="grid grid-cols-[auto_1fr] gap-4 items-start p-4 rounded-lg bg-[#161b22] border border-[#30363d]">
-        <code class="text-xs font-mono text-[#58a6ff] whitespace-nowrap">gid dir list</code>
-        <p class="text-sm text-[#8b949e]">List all directory-to-identity mappings.</p>
-      </div>
+  <!-- ============================ COMMANDS ============================ -->
+  <section class="sec" id="commands">
+    <div class="sec-head">
+      <span class="sec-tag">03 / Commands</span>
+      <span class="sec-rule" aria-hidden="true"></span>
+      <span class="mono c-faint">13 entries — prefix <code>gid</code></span>
+    </div>
+    <h2 class="macro macro--l">Command<br>reference</h2>
+    <p class="prose sec-lede">Every command is prefixed with <code class="ic">gid</code>.</p>
+
+    <div class="tbl-wrap">
+      <table class="cmdtbl">
+        <thead>
+          <tr><th scope="col">Idx</th><th scope="col">Command</th><th scope="col">Function</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="t-i">01</td>
+            <td class="t-c">gid init</td>
+            <td class="t-d">Interactive first-time setup. Detects existing config and offers to re-apply it. Run once per machine.</td>
+          </tr>
+          <tr>
+            <td class="t-i">02</td>
+            <td class="t-c">gid status</td>
+            <td class="t-d">Show which identity is active for the current directory. No arguments needed.</td>
+          </tr>
+          <tr>
+            <td class="t-i">03</td>
+            <td class="t-c">gid apply</td>
+            <td class="t-d">Sync config to system files: rewrites <code class="ic">~/.ssh/config</code> and <code class="ic">~/.gitconfig</code>. Run after manual config edits.</td>
+          </tr>
+          <tr>
+            <td class="t-i">04</td>
+            <td class="t-c">gid clone &lt;url&gt; [dir]</td>
+            <td class="t-d">Clone a repo via SSH. Prompts to select an identity and rewrites the URL to use that identity's host alias.</td>
+          </tr>
+          <tr>
+            <td class="t-i">05</td>
+            <td class="t-c">gid id list</td>
+            <td class="t-d">List all identities with their SSH key, host alias, and mapped directories.</td>
+          </tr>
+          <tr>
+            <td class="t-i">06</td>
+            <td class="t-c">gid id add</td>
+            <td class="t-d">Add a new identity interactively — ID, name, email, SSH key, host alias.</td>
+          </tr>
+          <tr>
+            <td class="t-i">07</td>
+            <td class="t-c">gid id edit &lt;id&gt;</td>
+            <td class="t-d">Edit name, email, or SSH host alias for an identity. Run <code class="ic">gid apply</code> afterwards to sync SSH config.</td>
+          </tr>
+          <tr>
+            <td class="t-i">08</td>
+            <td class="t-c">gid id remove &lt;id&gt;</td>
+            <td class="t-d">Remove an identity, its SSH Host block, and all its gitconfig includeIf entries from <code class="ic">~/.gitconfig</code>.</td>
+          </tr>
+          <tr>
+            <td class="t-i">09</td>
+            <td class="t-c">gid id show &lt;id&gt;</td>
+            <td class="t-d">Show all details for one identity, including mapped directories.</td>
+          </tr>
+          <tr>
+            <td class="t-i">10</td>
+            <td class="t-c">gid dir add &lt;path&gt; -i &lt;id&gt;</td>
+            <td class="t-d">Map a directory to an identity. Any repo inside that path uses the identity's user and SSH key automatically.</td>
+          </tr>
+          <tr>
+            <td class="t-i">11</td>
+            <td class="t-c">gid dir remove &lt;path&gt;</td>
+            <td class="t-d">Remove a directory mapping. Git stops auto-selecting the identity for that folder.</td>
+          </tr>
+          <tr>
+            <td class="t-i">12</td>
+            <td class="t-c">gid dir list</td>
+            <td class="t-d">List all directory-to-identity mappings.</td>
+          </tr>
+          <tr>
+            <td class="t-i">13</td>
+            <td class="t-c">gid --help</td>
+            <td class="t-d">Print the full command index with flags and arguments for any subcommand.</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </section>
 
-  <!-- Sandbox / Testing section -->
-  <section class="relative z-10 w-full max-w-5xl mx-auto px-6 pb-20 border-t border-[#30363d]/50 pt-16" id="testing">
-    <h2 class="text-2xl font-semibold text-white mb-2 tracking-tight">Sandbox testing</h2>
-    <p class="text-sm text-[#8b949e] mb-8">Try GiMan without touching your real SSH or git config by running it in an isolated home directory.</p>
-    <div class="rounded-lg bg-[#0d1117] border border-[#30363d] overflow-hidden">
-      <div class="bg-[#161b22] px-4 py-2.5 border-b border-[#30363d] flex items-center justify-between">
-        <span class="text-xs text-[#8b949e] font-mono">Isolated sandbox — safe to run anywhere</span>
-        <button onclick="copyBlock('sandbox-script')" class="text-xs text-[#8b949e] hover:text-white transition-colors flex items-center gap-1">
-          <iconify-icon icon="solar:copy-linear" width="14"></iconify-icon>
-          Copy all
-        </button>
-      </div>
-      <pre id="sandbox-script" class="p-6 font-mono text-xs text-[#e6edf3] overflow-x-auto leading-relaxed"><span class="text-[#8b949e]"># Create an isolated sandbox home</span>
-export GIMAN_HOME="$(mktemp -d)/giman-sandbox"
-mkdir -p "$GIMAN_HOME/.ssh" "$GIMAN_HOME/.giman" "$GIMAN_HOME/dev/personal" "$GIMAN_HOME/dev/work"
-
-<span class="text-[#8b949e]"># Install giman globally</span>
-npm install -g giman
-
-<span class="text-[#8b949e]"># Generate SSH keys for two identities</span>
-ssh-keygen -t ed25519 -f "$GIMAN_HOME/.ssh/giman_personal" -N '' -C 'giman-personal'
-ssh-keygen -t ed25519 -f "$GIMAN_HOME/.ssh/giman_work"     -N '' -C 'giman-work'
-
-<span class="text-[#8b949e]"># Write a pre-built config (skip interactive prompts)</span>
-cat &gt; "$GIMAN_HOME/.giman/config.json" &lt;&lt; EOF
-{
-  "identities": [
-    {
-      "id": "personal", "name": "Jane Dev", "email": "jane@personal.dev",
-      "sshKeyPath": "$GIMAN_HOME/.ssh/giman_personal",
-      "sshHost": "github-personal", "directories": ["$GIMAN_HOME/dev/personal"]
-    },
-    {
-      "id": "work", "name": "Jane Work", "email": "jane@company.com",
-      "sshKeyPath": "$GIMAN_HOME/.ssh/giman_work",
-      "sshHost": "github-work", "directories": ["$GIMAN_HOME/dev/work"]
-    }
-  ],
-  "defaultIdentity": "personal"
-}
-EOF
-
-<span class="text-[#8b949e]"># Point HOME at the sandbox so giman reads/writes there</span>
-HOME="$GIMAN_HOME"
-
-<span class="text-[#8b949e]"># Apply — writes SSH config and .gitconfig</span>
-echo "y" | HOME="$GIMAN_HOME" gid apply
-
-<span class="text-[#8b949e]"># --- Test identity list ---</span>
-HOME="$GIMAN_HOME" gid identity list
-
-<span class="text-[#8b949e]"># --- Test status in a mapped dir ---</span>
-cd "$GIMAN_HOME/dev/work"
-HOME="$GIMAN_HOME" gid status
-<span class="text-[#8b949e]"># Expected: ✓ Identity: work — Jane Work</span>
-
-<span class="text-[#8b949e]"># --- Test that git picks up identity gitconfig ---</span>
-cd "$GIMAN_HOME/dev/work"
-git init my-repo && cd my-repo
-git config --list --show-origin | grep "user\."
-<span class="text-[#8b949e]"># Expected: jane@company.com from work.gitconfig</span>
-
-<span class="text-[#8b949e]"># --- Test commit ---</span>
-echo "hello" &gt; README.md
-git add README.md
-git commit -m "Initial commit"
-git log --format="%an &lt;%ae&gt;" HEAD
-<span class="text-[#8b949e]"># Expected: Jane Work &lt;jane@company.com&gt;</span>
-
-<span class="text-[#8b949e]"># --- Test relative path dir add ---</span>
-cd "$GIMAN_HOME/dev/personal"
-HOME="$GIMAN_HOME" gid dir add . --identity personal
-<span class="text-[#8b949e]"># Expected: stores absolute path /...giman-sandbox/home/dev/personal</span>
-HOME="$GIMAN_HOME" gid dir list
-
-<span class="text-[#8b949e]"># --- Test identity remove cleans up gitconfig ---</span>
-HOME="$GIMAN_HOME" gid identity remove work
-cat "$GIMAN_HOME/.gitconfig"
-<span class="text-[#8b949e]"># Expected: only the personal includeIf remains</span>
-
-<span class="text-[#8b949e]"># Inspect what was written</span>
-cat "$GIMAN_HOME/.ssh/config"
-cat "$GIMAN_HOME/.gitconfig"
-echo "Sandbox at: $GIMAN_HOME"</pre>
+  <!-- ============================ CHANGELOG ============================ -->
+  <section class="sec" id="changelog">
+    <div class="sec-head">
+      <span class="sec-tag">04 / Changelog</span>
+      <span class="sec-rule" aria-hidden="true"></span>
+      <span class="mono c-faint">3 releases on record</span>
     </div>
-    <p class="text-xs text-[#8b949e] mt-4">The sandbox uses a temporary directory as <code class="text-[#e6edf3] bg-[#161b22] px-1 py-0.5 rounded border border-[#30363d]">HOME</code> so none of your real config files are touched. Delete the temp directory when done.</p>
-  </section>
-
-  <!-- Changelog section -->
-  <section class="relative z-10 w-full max-w-5xl mx-auto px-6 pb-20 border-t border-[#30363d]/50 pt-16" id="changelog">
-    <h2 class="text-2xl font-semibold text-white mb-2 tracking-tight">Changelog</h2>
-    <p class="text-sm text-[#8b949e] mb-8">What changed in each release.</p>
+    <h2 class="macro macro--l">Changelog</h2>
+    <p class="prose sec-lede">What changed in each release.</p>
 
     <!-- v1.0.4 -->
-    <div class="mb-10">
-      <div class="flex items-center gap-3 mb-4">
-        <span class="text-sm font-mono font-semibold text-[#58a6ff]">v1.0.4</span>
-        <span class="text-xs text-[#8b949e]">2026-07-28</span>
-        <span class="text-xs px-2 py-0.5 rounded-full bg-[#da3633]/20 text-[#da3633] border border-[#da3633]/30">bugfix</span>
+    <div class="rel">
+      <div class="rel-head">
+        <span class="rel-v">v1.0.4</span>
+        <span class="rel-d">2026-07-28</span>
+        <span class="rel-badge">Bugfix</span>
       </div>
-      <div class="space-y-2 ml-2">
-        <div class="flex items-start gap-3 p-4 rounded-lg bg-[#161b22] border border-[#30363d]">
-          <span class="text-[#3fb950] text-xs mt-0.5 font-mono font-semibold">fix</span>
+      <div class="hgrid">
+        <div class="entry">
+          <span class="entry-t entry-t--feat">Change</span>
           <div>
-            <p class="text-sm text-[#e6edf3] font-medium mb-0.5"><code class="text-xs">gid identity remove</code> now cleans up <code class="text-xs">~/.gitconfig</code> includeIf entries</p>
-            <p class="text-xs text-[#8b949e]">Removing an identity previously left stale <code class="text-[#e6edf3]">[includeIf]</code> blocks pointing at deleted gitconfig files. These are now pruned on removal.</p>
+            <h4><code class="ic">gid identity</code> renamed to <code class="ic">gid id</code></h4>
+            <p>The subcommand group is now <code class="ic">gid id</code> — <code class="ic">list</code>, <code class="ic">add</code>, <code class="ic">edit</code>, <code class="ic">remove</code>, <code class="ic">show</code> are unchanged. <code class="ic">gid identity</code> still works as an alias, so existing scripts keep running.</p>
           </div>
         </div>
-        <div class="flex items-start gap-3 p-4 rounded-lg bg-[#161b22] border border-[#30363d]">
-          <span class="text-[#3fb950] text-xs mt-0.5 font-mono font-semibold">fix</span>
+        <div class="entry">
+          <span class="entry-t entry-t--fix">Fix</span>
           <div>
-            <p class="text-sm text-[#e6edf3] font-medium mb-0.5">SSH host alias now requires valid hostname characters only</p>
-            <p class="text-xs text-[#8b949e]">Spaces and special characters are now rejected at input. Previously, entering <code class="text-[#e6edf3]">github my work</code> would write a broken <code class="text-[#e6edf3]">Host github my work</code> entry — three patterns instead of one.</p>
+            <h4><code class="ic">gid id remove</code> now cleans up <code class="ic">~/.gitconfig</code> includeIf entries</h4>
+            <p>Removing an identity previously left stale <code class="ic">[includeIf]</code> blocks pointing at deleted gitconfig files. These are now pruned on removal.</p>
           </div>
         </div>
-        <div class="flex items-start gap-3 p-4 rounded-lg bg-[#161b22] border border-[#30363d]">
-          <span class="text-[#3fb950] text-xs mt-0.5 font-mono font-semibold">fix</span>
+        <div class="entry">
+          <span class="entry-t entry-t--fix">Fix</span>
           <div>
-            <p class="text-sm text-[#e6edf3] font-medium mb-0.5">SSH keygen: disconnected inherited stdin and unread stdout pipe</p>
-            <p class="text-xs text-[#8b949e]">The <code class="text-[#e6edf3]">ssh-keygen</code> subprocess previously inherited the parent's terminal stdin and had stdout piped but never consumed. Changed to <code class="text-[#e6edf3]">['ignore', 'ignore', 'pipe']</code> — only stderr is captured for error reporting.</p>
+            <h4>SSH host alias now requires valid hostname characters only</h4>
+            <p>Spaces and special characters are rejected at input. Previously, entering <code class="ic">github my work</code> would write a broken <code class="ic">Host github my work</code> entry — three patterns instead of one.</p>
           </div>
         </div>
-        <div class="flex items-start gap-3 p-4 rounded-lg bg-[#161b22] border border-[#30363d]">
-          <span class="text-[#3fb950] text-xs mt-0.5 font-mono font-semibold">fix</span>
+        <div class="entry">
+          <span class="entry-t entry-t--fix">Fix</span>
           <div>
-            <p class="text-sm text-[#e6edf3] font-medium mb-0.5"><code class="text-xs">resolveHome('$HOME')</code> now correctly expands to the home directory</p>
-            <p class="text-xs text-[#8b949e]">Bare <code class="text-[#e6edf3]">$HOME</code> (without trailing slash) was returned as the literal string. It is now expanded the same way as <code class="text-[#e6edf3]">$HOME/</code> and <code class="text-[#e6edf3]">~/</code>.</p>
+            <h4>SSH keygen: disconnected inherited stdin and unread stdout pipe</h4>
+            <p>The <code class="ic">ssh-keygen</code> subprocess previously inherited the parent's terminal stdin and had stdout piped but never consumed. Changed to <code class="ic">['ignore', 'ignore', 'pipe']</code> — only stderr is captured, for error reporting.</p>
           </div>
         </div>
-        <div class="flex items-start gap-3 p-4 rounded-lg bg-[#161b22] border border-[#30363d]">
-          <span class="text-[#3fb950] text-xs mt-0.5 font-mono font-semibold">fix</span>
+        <div class="entry">
+          <span class="entry-t entry-t--fix">Fix</span>
           <div>
-            <p class="text-sm text-[#e6edf3] font-medium mb-0.5"><code class="text-xs">gid dir add</code> now resolves relative paths against CWD</p>
-            <p class="text-xs text-[#8b949e]">Paths like <code class="text-[#e6edf3]">./subdir</code>, <code class="text-[#e6edf3]">.</code>, and <code class="text-[#e6edf3]">../other</code> are now expanded to absolute paths before being stored. Previously they were saved as-is, causing <code class="text-[#e6edf3]">gid status</code> to never match since the relative path was resolved against whichever directory you happened to run the next command from.</p>
+            <h4><code class="ic">resolveHome('$HOME')</code> now correctly expands to the home directory</h4>
+            <p>Bare <code class="ic">$HOME</code> (without trailing slash) was returned as the literal string. It is now expanded the same way as <code class="ic">$HOME/</code> and <code class="ic">~/</code>.</p>
           </div>
         </div>
-        <div class="flex items-start gap-3 p-4 rounded-lg bg-[#161b22] border border-[#30363d]">
-          <span class="text-[#58a6ff] text-xs mt-0.5 font-mono font-semibold">chore</span>
+        <div class="entry">
+          <span class="entry-t entry-t--fix">Fix</span>
           <div>
-            <p class="text-sm text-[#e6edf3] font-medium mb-0.5">Merged duplicate import in <code class="text-xs">status.ts</code></p>
-            <p class="text-xs text-[#8b949e]">Two separate import statements from <code class="text-[#e6edf3]">../services/config.js</code> were consolidated into one.</p>
+            <h4><code class="ic">gid dir add</code> now resolves relative paths against CWD</h4>
+            <p>Paths like <code class="ic">./subdir</code>, <code class="ic">.</code>, and <code class="ic">../other</code> are expanded to absolute paths before being stored. Previously they were saved as-is, causing <code class="ic">gid status</code> to never match — the relative path resolved against whichever directory you happened to run the next command from.</p>
+          </div>
+        </div>
+        <div class="entry">
+          <span class="entry-t">Chore</span>
+          <div>
+            <h4>Merged duplicate import in <code class="ic">status.ts</code></h4>
+            <p>Two separate import statements from <code class="ic">../services/config.js</code> were consolidated into one.</p>
           </div>
         </div>
       </div>
     </div>
 
     <!-- v1.0.3 -->
-    <div class="mb-10">
-      <div class="flex items-center gap-3 mb-4">
-        <span class="text-sm font-mono font-semibold text-[#58a6ff]">v1.0.3</span>
-        <span class="text-xs text-[#8b949e]">2025-10-12</span>
-        <span class="text-xs px-2 py-0.5 rounded-full bg-[#58a6ff]/20 text-[#58a6ff] border border-[#58a6ff]/30">feature</span>
+    <div class="rel">
+      <div class="rel-head">
+        <span class="rel-v">v1.0.3</span>
+        <span class="rel-d">2025-10-12</span>
+        <span class="rel-badge rel-badge--out">Feature</span>
       </div>
-      <div class="space-y-2 ml-2">
-        <div class="flex items-start gap-3 p-4 rounded-lg bg-[#161b22] border border-[#30363d]">
-          <span class="text-[#3fb950] text-xs mt-0.5 font-mono font-semibold">feat</span>
+      <div class="hgrid">
+        <div class="entry">
+          <span class="entry-t entry-t--feat">Feat</span>
           <div>
-            <p class="text-sm text-[#e6edf3] font-medium mb-0.5">Added <code class="text-xs">gid clone</code> command</p>
-            <p class="text-xs text-[#8b949e]">Clone a GitHub repo via SSH with interactive identity selection. GiMan rewrites the URL to use the chosen identity's host alias automatically.</p>
+            <h4>Added <code class="ic">gid clone</code> command</h4>
+            <p>Clone a GitHub repo via SSH with interactive identity selection. GiMan rewrites the URL to use the chosen identity's host alias automatically.</p>
           </div>
         </div>
-        <div class="flex items-start gap-3 p-4 rounded-lg bg-[#161b22] border border-[#30363d]">
-          <span class="text-[#3fb950] text-xs mt-0.5 font-mono font-semibold">feat</span>
+        <div class="entry">
+          <span class="entry-t entry-t--feat">Feat</span>
           <div>
-            <p class="text-sm text-[#e6edf3] font-medium mb-0.5">Path traversal guard on SSH key and gitconfig paths</p>
-            <p class="text-xs text-[#8b949e]">Identity IDs are validated against <code class="text-[#e6edf3]">/^[a-zA-Z0-9_-]+$/</code> and paths are asserted to stay within their expected base directories.</p>
+            <h4>Path traversal guard on SSH key and gitconfig paths</h4>
+            <p>Identity IDs are validated against <code class="ic">/^[a-zA-Z0-9_-]+$/</code> and paths are asserted to stay within their expected base directories.</p>
           </div>
         </div>
       </div>
     </div>
 
     <!-- v1.0.0 -->
-    <div>
-      <div class="flex items-center gap-3 mb-4">
-        <span class="text-sm font-mono font-semibold text-[#58a6ff]">v1.0.0</span>
-        <span class="text-xs text-[#8b949e]">2025-08-01</span>
-        <span class="text-xs px-2 py-0.5 rounded-full bg-[#a371f7]/20 text-[#a371f7] border border-[#a371f7]/30">initial release</span>
+    <div class="rel">
+      <div class="rel-head">
+        <span class="rel-v">v1.0.0</span>
+        <span class="rel-d">2025-08-01</span>
+        <span class="rel-badge rel-badge--out">Initial release</span>
       </div>
-      <div class="space-y-2 ml-2">
-        <div class="flex items-start gap-3 p-4 rounded-lg bg-[#161b22] border border-[#30363d]">
-          <span class="text-[#3fb950] text-xs mt-0.5 font-mono font-semibold">feat</span>
+      <div class="hgrid">
+        <div class="entry">
+          <span class="entry-t entry-t--feat">Feat</span>
           <div>
-            <p class="text-sm text-[#e6edf3] font-medium mb-0.5">Core identity management: <code class="text-xs">gid init</code>, <code class="text-xs">gid identity add/edit/remove/show/list</code></p>
-            <p class="text-xs text-[#8b949e]">Create and manage multiple git identities (name, email, SSH key, host alias) stored in <code class="text-[#e6edf3]">~/.giman/config.json</code>.</p>
+            <h4>Core identity management — <code class="ic">gid init</code>, <code class="ic">gid identity add/edit/remove/show/list</code></h4>
+            <p>Create and manage multiple git identities (name, email, SSH key, host alias) stored in <code class="ic">~/.giman/config.json</code>.</p>
           </div>
         </div>
-        <div class="flex items-start gap-3 p-4 rounded-lg bg-[#161b22] border border-[#30363d]">
-          <span class="text-[#3fb950] text-xs mt-0.5 font-mono font-semibold">feat</span>
+        <div class="entry">
+          <span class="entry-t entry-t--feat">Feat</span>
           <div>
-            <p class="text-sm text-[#e6edf3] font-medium mb-0.5">Directory mappings via <code class="text-xs">gid dir add/remove/list</code></p>
-            <p class="text-xs text-[#8b949e]">Map a directory to an identity so git automatically uses the right user and SSH key for any repo inside that path.</p>
+            <h4>Directory mappings via <code class="ic">gid dir add/remove/list</code></h4>
+            <p>Map a directory to an identity so git automatically uses the right user and SSH key for any repo inside that path.</p>
           </div>
         </div>
-        <div class="flex items-start gap-3 p-4 rounded-lg bg-[#161b22] border border-[#30363d]">
-          <span class="text-[#3fb950] text-xs mt-0.5 font-mono font-semibold">feat</span>
+        <div class="entry">
+          <span class="entry-t entry-t--feat">Feat</span>
           <div>
-            <p class="text-sm text-[#e6edf3] font-medium mb-0.5">SSH config and gitconfig sync via <code class="text-xs">gid apply</code></p>
-            <p class="text-xs text-[#8b949e]">Writes <code class="text-[#e6edf3]">Host</code> blocks to <code class="text-[#e6edf3]">~/.ssh/config</code> and <code class="text-[#e6edf3]">includeIf</code> rules to <code class="text-[#e6edf3]">~/.gitconfig</code>. All changes are opt-in and GiMan markers make them safe to re-run.</p>
+            <h4>SSH config and gitconfig sync via <code class="ic">gid apply</code></h4>
+            <p>Writes <code class="ic">Host</code> blocks to <code class="ic">~/.ssh/config</code> and <code class="ic">includeIf</code> rules to <code class="ic">~/.gitconfig</code>. All changes are opt-in, and GiMan markers make them safe to re-run.</p>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Footer -->
-  <footer class="w-full border-t border-[#30363d] bg-[#161b22] py-12 mt-auto relative z-10">
-    <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
-      <div class="text-center md:text-left">
-        <p class="text-sm text-[#8b949e]">
-          Designed for developers who juggle multiple hats.
-        </p>
-        <p class="text-xs text-[#8b949e] mt-2 opacity-60">
-          &copy; <script>document.write(new Date().getFullYear())</script> GiMan. MIT License.
+  <!-- ============================ CTA ============================ -->
+  <section class="sec" style="border-bottom:0">
+    <div class="sec-head">
+      <span class="sec-tag sec-tag--red">05 / Install</span>
+      <span class="sec-rule" aria-hidden="true"></span>
+      <span class="mono c-faint">One command</span>
+    </div>
+    <h2 class="macro macro--l">Stop editing<br>SSH config<br><span class="c-red">by hand.</span></h2>
+    <div class="cmdbar" style="margin-top:2rem">
+      <span class="cmdbar-sig" aria-hidden="true">$</span>
+      <code id="install-cmd-2">npm install -g giman</code>
+      <button class="btn-copy" data-copy="install-cmd-2" type="button">Copy</button>
+    </div>
+  </section>
+
+  <div class="hazard" style="border-bottom:0" aria-hidden="true"></div>
+</div>
+
+<!-- ============================ FOOTER ============================ -->
+<footer class="foot">
+  <div class="foot-in">
+    <div class="foot-mark">
+      <p class="macro">GiMan<sup>®</sup></p>
+    </div>
+    <div class="foot-grid">
+      <div class="foot-cell">
+        <p class="foot-note" style="margin:0">
+          Built for developers who juggle multiple hats.<br>
+          <span class="c-red">///</span> Unit / D-01 &nbsp;·&nbsp; Rev 1.0.4 &nbsp;·&nbsp; MIT License<br>
+          &copy; <span id="year">2026</span> GiMan. All rights reserved.
         </p>
       </div>
-      <div class="flex gap-6">
-        <a href="README.md" class="text-sm text-[#58a6ff] hover:text-[#58a6ff]/80 transition-colors">Documentation</a>
-        <a href="https://github.com/Lokesh-Kumar-Dudi/giman" class="text-sm text-[#e6edf3] hover:text-white transition-colors">GitHub</a>
-        <a href="https://npmjs.com/package/giman" class="text-sm text-[#e6edf3] hover:text-white transition-colors">NPM</a>
+      <div class="foot-cell">
+        <p class="foot-note" style="margin:0 0 0.9rem">[ Index ]</p>
+        <div class="foot-links">
+          <a href="README.md">Docs</a>
+          <a href="https://github.com/Lokesh-Kumar-Dudi/giman" target="_blank" rel="noopener">GitHub ↗</a>
+          <a href="https://npmjs.com/package/giman" target="_blank" rel="noopener">npm ↗</a>
+          <a href="https://github.com/Lokesh-Kumar-Dudi/giman/issues" target="_blank" rel="noopener">Issues ↗</a>
+        </div>
       </div>
     </div>
-  </footer>
+  </div>
+</footer>
 
-  <!-- Logic Script -->
-  <script>
-    function copyBlock(id) {
-      var el = document.getElementById(id);
-      if (el) navigator.clipboard.writeText(el.innerText);
-    }
+<script>
+  /* ---------- Copy-to-clipboard, with stamped confirmation ---------- */
+  document.querySelectorAll('.btn-copy').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var el = document.getElementById(btn.dataset.copy);
+      if (!el) return;
+      var label = btn.textContent;
+      navigator.clipboard.writeText(el.innerText).then(function () {
+        btn.textContent = 'Copied';
+        btn.dataset.done = '1';
+        setTimeout(function () {
+          btn.textContent = label;
+          delete btn.dataset.done;
+        }, 1600);
+      });
+    });
+  });
 
-    // Count-up animation: ease-out cubic, ~1.4s
-    function animateCount(el, target) {
-      var start = null;
-      var duration = 1400;
-      function step(ts) {
-        if (!start) start = ts;
-        var progress = Math.min((ts - start) / duration, 1);
-        // ease-out cubic
-        var eased = 1 - Math.pow(1 - progress, 3);
-        var current = Math.round(eased * target);
-        el.textContent = current.toLocaleString();
-        if (progress < 1) requestAnimationFrame(step);
-        else el.textContent = target.toLocaleString();
+  /* ---------- Footer year ---------- */
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  /* ---------- Download counter: digits scramble, then lock left-to-right ----------
+     Fires on whichever lands LAST — the fetch or the scroll-in. Neither one gates
+     the other, so a fast fetch can't be dropped by an observer that already ran. */
+  (function () {
+    var el = document.getElementById('counter-downloads');
+    if (!el) return;
+
+    var target = null;   // resolved download count
+    var seen = false;    // has scrolled into view
+    var ran = false;
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function scramble(node, value) {
+      var finalStr = value.toLocaleString();
+      var chars = finalStr.split('');
+      var slots = [];
+      for (var i = 0; i < chars.length; i++) {
+        if (chars[i] >= '0' && chars[i] <= '9') slots.push(i);
       }
-      requestAnimationFrame(step);
-    }
 
-    // Intersection observer so count starts when element scrolls into view
-    var counterEl = document.getElementById('counter-downloads');
-    var counted = false;
-    var downloadsTarget = null;
+      if (reduce || !slots.length) { node.textContent = finalStr; return; }
 
-    function tryStart() {
-      if (!counted && downloadsTarget !== null) {
-        counted = true;
-        animateCount(counterEl, downloadsTarget);
+      var buf = chars.slice();
+      function roll(k) { buf[slots[k]] = String((Math.random() * 10) | 0); }
+      for (var s = 0; s < slots.length; s++) roll(s);
+
+      node.dataset.scrambling = '1';
+      node.textContent = buf.join('');
+
+      var duration = 2000;
+      var rollEvery = 45;          // re-roll cadence — 60fps random reads as mush
+      var start = performance.now();
+      var lastRoll = start;
+
+      function frame(now) {
+        var p = Math.min((now - start) / duration, 1);
+        var eased = 1 - Math.pow(1 - p, 3);
+        var locked = Math.floor(eased * slots.length);
+        var rerolling = now - lastRoll >= rollEvery;
+        if (rerolling) lastRoll = now;
+
+        for (var k = 0; k < slots.length; k++) {
+          if (k < locked) buf[slots[k]] = chars[slots[k]];
+          else if (rerolling) roll(k);
+        }
+        node.textContent = buf.join('');
+
+        if (p < 1) {
+          requestAnimationFrame(frame);
+        } else {
+          node.textContent = finalStr;
+          delete node.dataset.scrambling;
+        }
       }
+      requestAnimationFrame(frame);
     }
 
-    var observer = new IntersectionObserver(function(entries) {
-      if (entries[0].isIntersecting) {
-        tryStart();
+    function maybeRun() {
+      if (ran || target === null || !seen) return;
+      ran = true;
+      scramble(el, target);
+    }
+
+    function inView() {
+      var r = el.getBoundingClientRect();
+      return r.top < (window.innerHeight || 0) && r.bottom > 0;
+    }
+
+    if ('IntersectionObserver' in window) {
+      var observer = new IntersectionObserver(function (entries) {
+        if (!entries[0].isIntersecting) return;
+        seen = true;
         observer.disconnect();
-      }
-    }, { threshold: 0.3 });
-    observer.observe(counterEl);
+        maybeRun();
+      }, { threshold: 0.25 });
+      observer.observe(el);
+    } else {
+      seen = true;
+    }
 
-    // Fetch npm download count
-    (function() {
-      var today = new Date();
-      var end = today.getFullYear() + '-' +
-        String(today.getMonth() + 1).padStart(2, '0') + '-' +
-        String(today.getDate()).padStart(2, '0');
-      var url = 'https://api.npmjs.org/downloads/point/2020-01-01:' + end + '/giman';
+    var today = new Date();
+    var end = today.getFullYear() + '-' +
+      String(today.getMonth() + 1).padStart(2, '0') + '-' +
+      String(today.getDate()).padStart(2, '0');
 
-      fetch(url)
-        .then(function(r) { return r.json(); })
-        .then(function(data) {
-          if (data.downloads != null && data.downloads > 0) {
-            downloadsTarget = data.downloads;
-            tryStart();
-          } else {
-            counterEl.textContent = '—';
-          }
-        })
-        .catch(function() {
-          counterEl.textContent = '—';
-        });
-    })();
-  </script>
+    fetch('https://api.npmjs.org/downloads/point/2020-01-01:' + end + '/giman')
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (data.downloads == null || data.downloads <= 0) throw new Error('no downloads');
+        target = data.downloads;
+        if (inView()) seen = true;   // already on screen before the observer settled
+        maybeRun();
+      })
+      .catch(function () { el.textContent = '—'; });
+  })();
+</script>
 </body>
 </html>
