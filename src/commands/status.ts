@@ -1,7 +1,6 @@
 import chalk from 'chalk';
 import path from 'path';
-import { readConfig } from '../services/config.js';
-import { resolveHome } from '../services/config.js';
+import { readConfig, resolveHome } from '../services/config.js';
 import { section, info, success } from '../utils/ui.js';
 
 export async function runStatus(): Promise<void> {

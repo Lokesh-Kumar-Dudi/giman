@@ -1,3 +1,4 @@
+import path from 'path';
 import { readConfig, writeConfig, resolveHome } from './config.js';
 import { generateKey, listExistingKeys, updateSshConfigFromIdentities } from './ssh.js';
 import {
@@ -56,12 +57,16 @@ export async function removeIdentity(id: string): Promise<void> {
   await removeIdentityGitconfig(id);
 }
 
+function resolveDir(directory: string): string {
+  return path.resolve(resolveHome(directory));
+}
+
 export async function addDirectoryToIdentity(identityId: string, directory: string): Promise<void> {
   const config = await readConfig();
   if (!config) throw new Error('No config found');
   const identity = config.identities.find((i) => i.id === identityId);
   if (!identity) throw new Error(`Identity "${identityId}" not found`);
-  const normalizedDir = resolveHome(directory);
+  const normalizedDir = resolveDir(directory);
   if (identity.directories.includes(normalizedDir)) return;
   identity.directories = [...identity.directories, normalizedDir];
   await writeConfig(config);
@@ -71,7 +76,7 @@ export async function addDirectoryToIdentity(identityId: string, directory: stri
 export async function removeDirectory(directory: string): Promise<void> {
   const config = await readConfig();
   if (!config) throw new Error('No config found');
-  const normalizedDir = resolveHome(directory);
+  const normalizedDir = resolveDir(directory);
   let changed = false;
   for (const identity of config.identities) {
     const idx = identity.directories.indexOf(normalizedDir);

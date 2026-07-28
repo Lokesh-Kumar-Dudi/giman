@@ -7,7 +7,7 @@ export function resolveHome(filePath: string): string {
   if (filePath.startsWith('~/') || filePath === '~') {
     return path.join(os.homedir(), filePath.slice(1));
   }
-  if (filePath.startsWith('$HOME/')) {
+  if (filePath.startsWith('$HOME/') || filePath === '$HOME') {
     return path.join(os.homedir(), filePath.slice(6));
   }
   return filePath;

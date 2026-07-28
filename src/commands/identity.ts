@@ -7,6 +7,7 @@ import {
   updateIdentity,
   removeIdentity,
   applySshConfig,
+  refreshGitconfigIncludeIf,
 } from '../services/identity.js';
 import { promptSshKeySetup, promptIdentityFields, promptUpdateSshConfig } from '../utils/prompts.js';
 import { resolveHome } from '../services/config.js';
@@ -127,6 +128,11 @@ export function registerIdentityCommands(program: Command): void {
         'Updating ~/.ssh/config',
         () => applySshConfig(identities, async () => Promise.resolve(true)).then(() => undefined),
         { successMessage: 'SSH config updated', failureMessage: 'Failed to update SSH config' }
+      );
+      await withSpinner(
+        'Updating ~/.gitconfig includeIf rules',
+        () => refreshGitconfigIncludeIf(),
+        { successMessage: 'Git config updated', failureMessage: 'Failed to update ~/.gitconfig' }
       );
       console.log('');
       success('Identity "' + id + '" removed.');

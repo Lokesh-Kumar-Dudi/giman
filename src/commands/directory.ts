@@ -1,4 +1,5 @@
 import chalk from 'chalk';
+import path from 'path';
 import type { Command } from 'commander';
 import { readConfig } from '../services/config.js';
 import { addDirectoryToIdentity, removeDirectory, listIdentities } from '../services/identity.js';
@@ -26,7 +27,7 @@ export function registerDirectoryCommands(program: Command): void {
         failure('No config found', 'Run gid init first to create ~/.giman/config.json');
         process.exit(1);
       }
-      const normalized = resolveHome(pathArg);
+      const normalized = path.resolve(resolveHome(pathArg));
       try {
         await withSpinner(
           'Adding directory to identity "' + opts.identity + '"',
@@ -47,7 +48,7 @@ export function registerDirectoryCommands(program: Command): void {
     .command('remove <path>')
     .description('Remove a directory mapping')
     .action(async (pathArg: string) => {
-      const normalized = resolveHome(pathArg);
+      const normalized = path.resolve(resolveHome(pathArg));
       await withSpinner(
         'Removing directory mapping',
         () => removeDirectory(pathArg),

@@ -2,15 +2,15 @@ import { z } from 'zod';
 
 /** Safe for use in file paths and Host names: no path traversal, no newlines. */
 const SAFE_ID_REGEX = /^[a-zA-Z0-9_-]+$/;
-/** No newlines or double-quotes to prevent config file injection. */
-const SAFE_SSH_HOST_REGEX = /^[^\n"]+$/;
+/** SSH host alias: only alphanumerics, dot, hyphen — no spaces (SSH treats spaces as pattern separators), no globs or injection chars. */
+const SAFE_SSH_HOST_REGEX = /^[a-zA-Z0-9._-]+$/;
 
 export const IdentitySchema = z.object({
   id: z.string().min(1).max(128).regex(SAFE_ID_REGEX, 'Identity ID must contain only letters, numbers, underscore, and hyphen'),
   name: z.string().min(1),
   email: z.string().email(),
   sshKeyPath: z.string().min(1),
-  sshHost: z.string().min(1).max(256).regex(SAFE_SSH_HOST_REGEX, 'SSH host must not contain newlines or double quotes'),
+  sshHost: z.string().min(1).max(253).regex(SAFE_SSH_HOST_REGEX, 'SSH host alias must contain only letters, numbers, dot, and hyphen (no spaces or special characters)'),
   directories: z.array(z.string()).default([]),
 });
 

@@ -36,7 +36,7 @@ export async function generateKey(identityId: string): Promise<string> {
     const proc = spawn(
       'ssh-keygen',
       ['-t', 'ed25519', '-f', keyPath, '-N', '', '-C', `giman-${identityId}`],
-      { stdio: ['inherit', 'pipe', 'pipe'] }
+      { stdio: ['ignore', 'ignore', 'pipe'] }
     );
     let stderr = '';
     proc.stderr?.on('data', (d) => { stderr += d.toString(); });
@@ -131,9 +131,9 @@ function extractGiManBlocks(content: string): { before: string; after: string } 
   };
 }
 
-/** Sanitize SSH Host so it cannot break config or inject new Host blocks (no newlines, no "). */
+/** Sanitize SSH Host so it cannot break config or inject new Host blocks (no newlines, spaces, quotes, or SSH glob chars). */
 function sanitizeSshHost(host: string): string {
-  return host.replace(/[\r\n"]/g, '').trim();
+  return host.replace(/[^a-zA-Z0-9._-]/g, '').trim();
 }
 
 function buildGiManBlock(sshHost: string, identityFile: string): string {

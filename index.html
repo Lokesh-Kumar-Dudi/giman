@@ -34,15 +34,6 @@
       border-radius: 9999px;
     }
     
-    /* Animation for loading state */
-    @keyframes pulse-opacity {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
-    }
-    .animate-pulse-slow {
-      animation: pulse-opacity 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-    }
-
     /* Custom scrollbar for pre blocks */
     pre::-webkit-scrollbar {
       height: 6px;
@@ -80,16 +71,6 @@
     
     <!-- Hero Text -->
     <div class="text-center max-w-2xl mx-auto mb-12 space-y-6">
-      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#30363d] bg-[#161b22]/50 backdrop-blur-sm">
-        <span class="relative flex h-2 w-2">
-          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#3fb950] opacity-75"></span>
-          <span class="relative inline-flex rounded-full h-2 w-2 bg-[#3fb950]"></span>
-        </span>
-        <span class="text-xs font-medium text-[#8b949e] tracking-wide" id="downloads-row">
-          <span id="npm-downloads" class="text-[#e6edf3]">Loading...</span> developers love it already!
-        </span>
-      </div>
-
       <h1 class="text-4xl md:text-6xl font-semibold tracking-tight text-white leading-[1.1]">
         Git identities, <br/>
         <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#58a6ff] to-[#3fb950]">managed.</span>
@@ -169,6 +150,26 @@
     </div>
   </main>
 
+  <!-- Downloads counter strip -->
+  <div class="relative z-10 w-full max-w-5xl mx-auto px-6 py-10">
+    <div class="rounded-xl border border-[#30363d] bg-[#161b22]/60 backdrop-blur-sm px-8 py-8 flex flex-col sm:flex-row items-center justify-center gap-8 sm:gap-16">
+      <div class="text-center">
+        <p class="text-4xl md:text-5xl font-semibold font-mono text-white tracking-tight tabular-nums" id="counter-downloads">—</p>
+        <p class="text-xs text-[#8b949e] mt-2 tracking-wide">total npm downloads</p>
+      </div>
+      <div class="hidden sm:block w-px h-12 bg-[#30363d]"></div>
+      <div class="text-center">
+        <p class="text-4xl md:text-5xl font-semibold font-mono text-white tracking-tight">v1.0.4</p>
+        <p class="text-xs text-[#8b949e] mt-2 tracking-wide">latest version</p>
+      </div>
+      <div class="hidden sm:block w-px h-12 bg-[#30363d]"></div>
+      <div class="text-center">
+        <p class="text-4xl md:text-5xl font-semibold font-mono text-white tracking-tight">MIT</p>
+        <p class="text-xs text-[#8b949e] mt-2 tracking-wide">license</p>
+      </div>
+    </div>
+  </div>
+
   <!-- Features Grid -->
   <section class="relative z-10 w-full max-w-5xl mx-auto px-6 py-20 border-t border-[#30363d]/50" id="quick-start">
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -208,6 +209,330 @@
     </div>
   </section>
 
+  <!-- How it works section -->
+  <section class="relative z-10 w-full max-w-5xl mx-auto px-6 pb-20" id="how-it-works">
+    <h2 class="text-2xl font-semibold text-white mb-2 tracking-tight">How it works</h2>
+    <p class="text-sm text-[#8b949e] mb-10">GiMan manages three system files on your behalf — all changes are reversible and opt-in.</p>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+      <div class="p-5 rounded-lg bg-[#161b22] border border-[#30363d]">
+        <p class="text-xs font-mono text-[#58a6ff] mb-2">~/.giman/config.json</p>
+        <p class="text-sm text-[#8b949e]">Source of truth. Stores identities, SSH key paths, and directory mappings. Edit manually or use <code class="text-[#e6edf3]">gid identity</code> commands.</p>
+      </div>
+      <div class="p-5 rounded-lg bg-[#161b22] border border-[#30363d]">
+        <p class="text-xs font-mono text-[#3fb950] mb-2">~/.gitconfig</p>
+        <p class="text-sm text-[#8b949e]">GiMan appends <code class="text-[#e6edf3]">includeIf "gitdir:..."</code> blocks that activate per-identity gitconfigs for specific directories automatically.</p>
+      </div>
+      <div class="p-5 rounded-lg bg-[#161b22] border border-[#30363d]">
+        <p class="text-xs font-mono text-[#a371f7] mb-2">~/.ssh/config</p>
+        <p class="text-sm text-[#8b949e]">GiMan writes <code class="text-[#e6edf3]">Host alias</code> blocks (e.g. <code class="text-[#e6edf3]">github-personal</code>) that map to <code class="text-[#e6edf3]">github.com</code> with your specific SSH key.</p>
+      </div>
+    </div>
+    <div class="rounded-lg bg-[#0d1117] border border-[#30363d] overflow-hidden">
+      <div class="bg-[#161b22] px-4 py-2.5 border-b border-[#30363d] flex items-center gap-2">
+        <span class="text-xs text-[#8b949e] font-mono">Complete quick-start walkthrough</span>
+      </div>
+      <div class="p-6 font-mono text-xs overflow-x-auto space-y-4">
+        <div>
+          <div class="text-[#8b949e] mb-1"># 1. Install</div>
+          <div class="text-[#e6edf3]"><span class="text-[#3fb950]">$</span> npm install -g giman</div>
+        </div>
+        <div>
+          <div class="text-[#8b949e] mb-1"># 2. Set up first identity (interactive)</div>
+          <div class="text-[#e6edf3]"><span class="text-[#3fb950]">$</span> gid init</div>
+          <div class="text-[#8b949e] pl-3 mt-1">→ Enter ID (e.g. "personal"), name, email, SSH host alias (e.g. "github-personal")</div>
+          <div class="text-[#8b949e] pl-3">→ Generate or select an existing SSH key</div>
+        </div>
+        <div>
+          <div class="text-[#8b949e] mb-1"># 3. Add a second identity</div>
+          <div class="text-[#e6edf3]"><span class="text-[#3fb950]">$</span> gid identity add</div>
+          <div class="text-[#8b949e] pl-3 mt-1">→ Repeat for "work" identity</div>
+        </div>
+        <div>
+          <div class="text-[#8b949e] mb-1"># 4. Map directories</div>
+          <div class="text-[#e6edf3]"><span class="text-[#3fb950]">$</span> gid dir add ~/dev/personal --identity personal</div>
+          <div class="text-[#e6edf3]"><span class="text-[#3fb950]">$</span> gid dir add ~/dev/work --identity work</div>
+        </div>
+        <div>
+          <div class="text-[#8b949e] mb-1"># 5. Check it works</div>
+          <div class="text-[#e6edf3]"><span class="text-[#3fb950]">$</span> cd ~/dev/work/my-project</div>
+          <div class="text-[#e6edf3]"><span class="text-[#3fb950]">$</span> gid status</div>
+          <div class="text-[#8b949e] pl-3 mt-1">✓ Identity: work — Jane Work &lt;jane@company.com&gt;</div>
+        </div>
+        <div>
+          <div class="text-[#8b949e] mb-1"># 6. Clone using the right identity</div>
+          <div class="text-[#e6edf3]"><span class="text-[#3fb950]">$</span> gid clone git@github.com:company/project.git</div>
+          <div class="text-[#8b949e] pl-3 mt-1">→ Prompts to pick identity, then clones with rewritten URL</div>
+        </div>
+        <div>
+          <div class="text-[#8b949e] mb-1"># 7. Commits use the right identity automatically</div>
+          <div class="text-[#e6edf3]"><span class="text-[#3fb950]">$</span> git commit -m "feat: add feature"</div>
+          <div class="text-[#8b949e] pl-3 mt-1">Committed as: Jane Work &lt;jane@company.com&gt;</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Commands Reference section -->
+  <section class="relative z-10 w-full max-w-5xl mx-auto px-6 pb-20 border-t border-[#30363d]/50 pt-16" id="commands">
+    <h2 class="text-2xl font-semibold text-white mb-2 tracking-tight">Commands</h2>
+    <p class="text-sm text-[#8b949e] mb-8">All commands are prefixed with <code class="text-[#e6edf3] bg-[#161b22] px-1.5 py-0.5 rounded border border-[#30363d]">gid</code>.</p>
+    <div class="space-y-2">
+      <!-- Command rows -->
+      <div class="grid grid-cols-[auto_1fr] gap-4 items-start p-4 rounded-lg bg-[#161b22] border border-[#30363d]">
+        <code class="text-xs font-mono text-[#58a6ff] whitespace-nowrap">gid init</code>
+        <p class="text-sm text-[#8b949e]">Interactive first-time setup. Detects existing config and offers to re-apply it. Run once per machine.</p>
+      </div>
+      <div class="grid grid-cols-[auto_1fr] gap-4 items-start p-4 rounded-lg bg-[#161b22] border border-[#30363d]">
+        <code class="text-xs font-mono text-[#58a6ff] whitespace-nowrap">gid status</code>
+        <p class="text-sm text-[#8b949e]">Show which identity is active for the current directory. No arguments needed.</p>
+      </div>
+      <div class="grid grid-cols-[auto_1fr] gap-4 items-start p-4 rounded-lg bg-[#161b22] border border-[#30363d]">
+        <code class="text-xs font-mono text-[#58a6ff] whitespace-nowrap">gid apply</code>
+        <p class="text-sm text-[#8b949e]">Sync config to system files: rewrites <code class="text-[#e6edf3]">~/.ssh/config</code> and <code class="text-[#e6edf3]">~/.gitconfig</code>. Run after manual config edits.</p>
+      </div>
+      <div class="grid grid-cols-[auto_1fr] gap-4 items-start p-4 rounded-lg bg-[#161b22] border border-[#30363d]">
+        <code class="text-xs font-mono text-[#58a6ff] whitespace-nowrap">gid clone &lt;url&gt; [dir]</code>
+        <p class="text-sm text-[#8b949e]">Clone a repo via SSH. Prompts to select an identity and rewrites the URL to use that identity's host alias.</p>
+      </div>
+      <div class="grid grid-cols-[auto_1fr] gap-4 items-start p-4 rounded-lg bg-[#161b22] border border-[#30363d]">
+        <code class="text-xs font-mono text-[#58a6ff] whitespace-nowrap">gid identity list</code>
+        <p class="text-sm text-[#8b949e]">List all identities with their SSH key, host alias, and mapped directories.</p>
+      </div>
+      <div class="grid grid-cols-[auto_1fr] gap-4 items-start p-4 rounded-lg bg-[#161b22] border border-[#30363d]">
+        <code class="text-xs font-mono text-[#58a6ff] whitespace-nowrap">gid identity add</code>
+        <p class="text-sm text-[#8b949e]">Add a new identity interactively (ID, name, email, SSH key, host alias).</p>
+      </div>
+      <div class="grid grid-cols-[auto_1fr] gap-4 items-start p-4 rounded-lg bg-[#161b22] border border-[#30363d]">
+        <code class="text-xs font-mono text-[#58a6ff] whitespace-nowrap">gid identity edit &lt;id&gt;</code>
+        <p class="text-sm text-[#8b949e]">Edit name, email, or SSH host alias for an identity. Run <code class="text-[#e6edf3]">gid apply</code> afterwards to sync SSH config.</p>
+      </div>
+      <div class="grid grid-cols-[auto_1fr] gap-4 items-start p-4 rounded-lg bg-[#161b22] border border-[#30363d]">
+        <code class="text-xs font-mono text-[#58a6ff] whitespace-nowrap">gid identity remove &lt;id&gt;</code>
+        <p class="text-sm text-[#8b949e]">Remove an identity, its SSH Host block, and all its gitconfig includeIf entries from <code class="text-[#e6edf3]">~/.gitconfig</code>.</p>
+      </div>
+      <div class="grid grid-cols-[auto_1fr] gap-4 items-start p-4 rounded-lg bg-[#161b22] border border-[#30363d]">
+        <code class="text-xs font-mono text-[#58a6ff] whitespace-nowrap">gid identity show &lt;id&gt;</code>
+        <p class="text-sm text-[#8b949e]">Show all details for one identity including mapped directories.</p>
+      </div>
+      <div class="grid grid-cols-[auto_1fr] gap-4 items-start p-4 rounded-lg bg-[#161b22] border border-[#30363d]">
+        <code class="text-xs font-mono text-[#58a6ff] whitespace-nowrap">gid dir add &lt;path&gt; -i &lt;id&gt;</code>
+        <p class="text-sm text-[#8b949e]">Map a directory to an identity. Any repo inside that path uses the identity's user and SSH key automatically.</p>
+      </div>
+      <div class="grid grid-cols-[auto_1fr] gap-4 items-start p-4 rounded-lg bg-[#161b22] border border-[#30363d]">
+        <code class="text-xs font-mono text-[#58a6ff] whitespace-nowrap">gid dir remove &lt;path&gt;</code>
+        <p class="text-sm text-[#8b949e]">Remove a directory mapping. Git will stop auto-selecting the identity for that folder.</p>
+      </div>
+      <div class="grid grid-cols-[auto_1fr] gap-4 items-start p-4 rounded-lg bg-[#161b22] border border-[#30363d]">
+        <code class="text-xs font-mono text-[#58a6ff] whitespace-nowrap">gid dir list</code>
+        <p class="text-sm text-[#8b949e]">List all directory-to-identity mappings.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sandbox / Testing section -->
+  <section class="relative z-10 w-full max-w-5xl mx-auto px-6 pb-20 border-t border-[#30363d]/50 pt-16" id="testing">
+    <h2 class="text-2xl font-semibold text-white mb-2 tracking-tight">Sandbox testing</h2>
+    <p class="text-sm text-[#8b949e] mb-8">Try GiMan without touching your real SSH or git config by running it in an isolated home directory.</p>
+    <div class="rounded-lg bg-[#0d1117] border border-[#30363d] overflow-hidden">
+      <div class="bg-[#161b22] px-4 py-2.5 border-b border-[#30363d] flex items-center justify-between">
+        <span class="text-xs text-[#8b949e] font-mono">Isolated sandbox — safe to run anywhere</span>
+        <button onclick="copyBlock('sandbox-script')" class="text-xs text-[#8b949e] hover:text-white transition-colors flex items-center gap-1">
+          <iconify-icon icon="solar:copy-linear" width="14"></iconify-icon>
+          Copy all
+        </button>
+      </div>
+      <pre id="sandbox-script" class="p-6 font-mono text-xs text-[#e6edf3] overflow-x-auto leading-relaxed"><span class="text-[#8b949e]"># Create an isolated sandbox home</span>
+export GIMAN_HOME="$(mktemp -d)/giman-sandbox"
+mkdir -p "$GIMAN_HOME/.ssh" "$GIMAN_HOME/.giman" "$GIMAN_HOME/dev/personal" "$GIMAN_HOME/dev/work"
+
+<span class="text-[#8b949e]"># Install giman globally</span>
+npm install -g giman
+
+<span class="text-[#8b949e]"># Generate SSH keys for two identities</span>
+ssh-keygen -t ed25519 -f "$GIMAN_HOME/.ssh/giman_personal" -N '' -C 'giman-personal'
+ssh-keygen -t ed25519 -f "$GIMAN_HOME/.ssh/giman_work"     -N '' -C 'giman-work'
+
+<span class="text-[#8b949e]"># Write a pre-built config (skip interactive prompts)</span>
+cat &gt; "$GIMAN_HOME/.giman/config.json" &lt;&lt; EOF
+{
+  "identities": [
+    {
+      "id": "personal", "name": "Jane Dev", "email": "jane@personal.dev",
+      "sshKeyPath": "$GIMAN_HOME/.ssh/giman_personal",
+      "sshHost": "github-personal", "directories": ["$GIMAN_HOME/dev/personal"]
+    },
+    {
+      "id": "work", "name": "Jane Work", "email": "jane@company.com",
+      "sshKeyPath": "$GIMAN_HOME/.ssh/giman_work",
+      "sshHost": "github-work", "directories": ["$GIMAN_HOME/dev/work"]
+    }
+  ],
+  "defaultIdentity": "personal"
+}
+EOF
+
+<span class="text-[#8b949e]"># Point HOME at the sandbox so giman reads/writes there</span>
+HOME="$GIMAN_HOME"
+
+<span class="text-[#8b949e]"># Apply — writes SSH config and .gitconfig</span>
+echo "y" | HOME="$GIMAN_HOME" gid apply
+
+<span class="text-[#8b949e]"># --- Test identity list ---</span>
+HOME="$GIMAN_HOME" gid identity list
+
+<span class="text-[#8b949e]"># --- Test status in a mapped dir ---</span>
+cd "$GIMAN_HOME/dev/work"
+HOME="$GIMAN_HOME" gid status
+<span class="text-[#8b949e]"># Expected: ✓ Identity: work — Jane Work</span>
+
+<span class="text-[#8b949e]"># --- Test that git picks up identity gitconfig ---</span>
+cd "$GIMAN_HOME/dev/work"
+git init my-repo && cd my-repo
+git config --list --show-origin | grep "user\."
+<span class="text-[#8b949e]"># Expected: jane@company.com from work.gitconfig</span>
+
+<span class="text-[#8b949e]"># --- Test commit ---</span>
+echo "hello" &gt; README.md
+git add README.md
+git commit -m "Initial commit"
+git log --format="%an &lt;%ae&gt;" HEAD
+<span class="text-[#8b949e]"># Expected: Jane Work &lt;jane@company.com&gt;</span>
+
+<span class="text-[#8b949e]"># --- Test relative path dir add ---</span>
+cd "$GIMAN_HOME/dev/personal"
+HOME="$GIMAN_HOME" gid dir add . --identity personal
+<span class="text-[#8b949e]"># Expected: stores absolute path /...giman-sandbox/home/dev/personal</span>
+HOME="$GIMAN_HOME" gid dir list
+
+<span class="text-[#8b949e]"># --- Test identity remove cleans up gitconfig ---</span>
+HOME="$GIMAN_HOME" gid identity remove work
+cat "$GIMAN_HOME/.gitconfig"
+<span class="text-[#8b949e]"># Expected: only the personal includeIf remains</span>
+
+<span class="text-[#8b949e]"># Inspect what was written</span>
+cat "$GIMAN_HOME/.ssh/config"
+cat "$GIMAN_HOME/.gitconfig"
+echo "Sandbox at: $GIMAN_HOME"</pre>
+    </div>
+    <p class="text-xs text-[#8b949e] mt-4">The sandbox uses a temporary directory as <code class="text-[#e6edf3] bg-[#161b22] px-1 py-0.5 rounded border border-[#30363d]">HOME</code> so none of your real config files are touched. Delete the temp directory when done.</p>
+  </section>
+
+  <!-- Changelog section -->
+  <section class="relative z-10 w-full max-w-5xl mx-auto px-6 pb-20 border-t border-[#30363d]/50 pt-16" id="changelog">
+    <h2 class="text-2xl font-semibold text-white mb-2 tracking-tight">Changelog</h2>
+    <p class="text-sm text-[#8b949e] mb-8">What changed in each release.</p>
+
+    <!-- v1.0.4 -->
+    <div class="mb-10">
+      <div class="flex items-center gap-3 mb-4">
+        <span class="text-sm font-mono font-semibold text-[#58a6ff]">v1.0.4</span>
+        <span class="text-xs text-[#8b949e]">2026-07-28</span>
+        <span class="text-xs px-2 py-0.5 rounded-full bg-[#da3633]/20 text-[#da3633] border border-[#da3633]/30">bugfix</span>
+      </div>
+      <div class="space-y-2 ml-2">
+        <div class="flex items-start gap-3 p-4 rounded-lg bg-[#161b22] border border-[#30363d]">
+          <span class="text-[#3fb950] text-xs mt-0.5 font-mono font-semibold">fix</span>
+          <div>
+            <p class="text-sm text-[#e6edf3] font-medium mb-0.5"><code class="text-xs">gid identity remove</code> now cleans up <code class="text-xs">~/.gitconfig</code> includeIf entries</p>
+            <p class="text-xs text-[#8b949e]">Removing an identity previously left stale <code class="text-[#e6edf3]">[includeIf]</code> blocks pointing at deleted gitconfig files. These are now pruned on removal.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-3 p-4 rounded-lg bg-[#161b22] border border-[#30363d]">
+          <span class="text-[#3fb950] text-xs mt-0.5 font-mono font-semibold">fix</span>
+          <div>
+            <p class="text-sm text-[#e6edf3] font-medium mb-0.5">SSH host alias now requires valid hostname characters only</p>
+            <p class="text-xs text-[#8b949e]">Spaces and special characters are now rejected at input. Previously, entering <code class="text-[#e6edf3]">github my work</code> would write a broken <code class="text-[#e6edf3]">Host github my work</code> entry — three patterns instead of one.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-3 p-4 rounded-lg bg-[#161b22] border border-[#30363d]">
+          <span class="text-[#3fb950] text-xs mt-0.5 font-mono font-semibold">fix</span>
+          <div>
+            <p class="text-sm text-[#e6edf3] font-medium mb-0.5">SSH keygen: disconnected inherited stdin and unread stdout pipe</p>
+            <p class="text-xs text-[#8b949e]">The <code class="text-[#e6edf3]">ssh-keygen</code> subprocess previously inherited the parent's terminal stdin and had stdout piped but never consumed. Changed to <code class="text-[#e6edf3]">['ignore', 'ignore', 'pipe']</code> — only stderr is captured for error reporting.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-3 p-4 rounded-lg bg-[#161b22] border border-[#30363d]">
+          <span class="text-[#3fb950] text-xs mt-0.5 font-mono font-semibold">fix</span>
+          <div>
+            <p class="text-sm text-[#e6edf3] font-medium mb-0.5"><code class="text-xs">resolveHome('$HOME')</code> now correctly expands to the home directory</p>
+            <p class="text-xs text-[#8b949e]">Bare <code class="text-[#e6edf3]">$HOME</code> (without trailing slash) was returned as the literal string. It is now expanded the same way as <code class="text-[#e6edf3]">$HOME/</code> and <code class="text-[#e6edf3]">~/</code>.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-3 p-4 rounded-lg bg-[#161b22] border border-[#30363d]">
+          <span class="text-[#3fb950] text-xs mt-0.5 font-mono font-semibold">fix</span>
+          <div>
+            <p class="text-sm text-[#e6edf3] font-medium mb-0.5"><code class="text-xs">gid dir add</code> now resolves relative paths against CWD</p>
+            <p class="text-xs text-[#8b949e]">Paths like <code class="text-[#e6edf3]">./subdir</code>, <code class="text-[#e6edf3]">.</code>, and <code class="text-[#e6edf3]">../other</code> are now expanded to absolute paths before being stored. Previously they were saved as-is, causing <code class="text-[#e6edf3]">gid status</code> to never match since the relative path was resolved against whichever directory you happened to run the next command from.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-3 p-4 rounded-lg bg-[#161b22] border border-[#30363d]">
+          <span class="text-[#58a6ff] text-xs mt-0.5 font-mono font-semibold">chore</span>
+          <div>
+            <p class="text-sm text-[#e6edf3] font-medium mb-0.5">Merged duplicate import in <code class="text-xs">status.ts</code></p>
+            <p class="text-xs text-[#8b949e]">Two separate import statements from <code class="text-[#e6edf3]">../services/config.js</code> were consolidated into one.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- v1.0.3 -->
+    <div class="mb-10">
+      <div class="flex items-center gap-3 mb-4">
+        <span class="text-sm font-mono font-semibold text-[#58a6ff]">v1.0.3</span>
+        <span class="text-xs text-[#8b949e]">2025-10-12</span>
+        <span class="text-xs px-2 py-0.5 rounded-full bg-[#58a6ff]/20 text-[#58a6ff] border border-[#58a6ff]/30">feature</span>
+      </div>
+      <div class="space-y-2 ml-2">
+        <div class="flex items-start gap-3 p-4 rounded-lg bg-[#161b22] border border-[#30363d]">
+          <span class="text-[#3fb950] text-xs mt-0.5 font-mono font-semibold">feat</span>
+          <div>
+            <p class="text-sm text-[#e6edf3] font-medium mb-0.5">Added <code class="text-xs">gid clone</code> command</p>
+            <p class="text-xs text-[#8b949e]">Clone a GitHub repo via SSH with interactive identity selection. GiMan rewrites the URL to use the chosen identity's host alias automatically.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-3 p-4 rounded-lg bg-[#161b22] border border-[#30363d]">
+          <span class="text-[#3fb950] text-xs mt-0.5 font-mono font-semibold">feat</span>
+          <div>
+            <p class="text-sm text-[#e6edf3] font-medium mb-0.5">Path traversal guard on SSH key and gitconfig paths</p>
+            <p class="text-xs text-[#8b949e]">Identity IDs are validated against <code class="text-[#e6edf3]">/^[a-zA-Z0-9_-]+$/</code> and paths are asserted to stay within their expected base directories.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- v1.0.0 -->
+    <div>
+      <div class="flex items-center gap-3 mb-4">
+        <span class="text-sm font-mono font-semibold text-[#58a6ff]">v1.0.0</span>
+        <span class="text-xs text-[#8b949e]">2025-08-01</span>
+        <span class="text-xs px-2 py-0.5 rounded-full bg-[#a371f7]/20 text-[#a371f7] border border-[#a371f7]/30">initial release</span>
+      </div>
+      <div class="space-y-2 ml-2">
+        <div class="flex items-start gap-3 p-4 rounded-lg bg-[#161b22] border border-[#30363d]">
+          <span class="text-[#3fb950] text-xs mt-0.5 font-mono font-semibold">feat</span>
+          <div>
+            <p class="text-sm text-[#e6edf3] font-medium mb-0.5">Core identity management: <code class="text-xs">gid init</code>, <code class="text-xs">gid identity add/edit/remove/show/list</code></p>
+            <p class="text-xs text-[#8b949e]">Create and manage multiple git identities (name, email, SSH key, host alias) stored in <code class="text-[#e6edf3]">~/.giman/config.json</code>.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-3 p-4 rounded-lg bg-[#161b22] border border-[#30363d]">
+          <span class="text-[#3fb950] text-xs mt-0.5 font-mono font-semibold">feat</span>
+          <div>
+            <p class="text-sm text-[#e6edf3] font-medium mb-0.5">Directory mappings via <code class="text-xs">gid dir add/remove/list</code></p>
+            <p class="text-xs text-[#8b949e]">Map a directory to an identity so git automatically uses the right user and SSH key for any repo inside that path.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-3 p-4 rounded-lg bg-[#161b22] border border-[#30363d]">
+          <span class="text-[#3fb950] text-xs mt-0.5 font-mono font-semibold">feat</span>
+          <div>
+            <p class="text-sm text-[#e6edf3] font-medium mb-0.5">SSH config and gitconfig sync via <code class="text-xs">gid apply</code></p>
+            <p class="text-xs text-[#8b949e]">Writes <code class="text-[#e6edf3]">Host</code> blocks to <code class="text-[#e6edf3]">~/.ssh/config</code> and <code class="text-[#e6edf3]">includeIf</code> rules to <code class="text-[#e6edf3]">~/.gitconfig</code>. All changes are opt-in and GiMan markers make them safe to re-run.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- Footer -->
   <footer class="w-full border-t border-[#30363d] bg-[#161b22] py-12 mt-auto relative z-10">
     <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
@@ -229,34 +554,68 @@
 
   <!-- Logic Script -->
   <script>
-    (function () {
-      var el = document.getElementById('npm-downloads');
-      var row = document.getElementById('downloads-row');
-      
-      if (!el || !row) return;
-      
-      // Animation class added by default in HTML or handled here
-      el.classList.add('animate-pulse-slow');
-      
+    function copyBlock(id) {
+      var el = document.getElementById(id);
+      if (el) navigator.clipboard.writeText(el.innerText);
+    }
+
+    // Count-up animation: ease-out cubic, ~1.4s
+    function animateCount(el, target) {
+      var start = null;
+      var duration = 1400;
+      function step(ts) {
+        if (!start) start = ts;
+        var progress = Math.min((ts - start) / duration, 1);
+        // ease-out cubic
+        var eased = 1 - Math.pow(1 - progress, 3);
+        var current = Math.round(eased * target);
+        el.textContent = current.toLocaleString();
+        if (progress < 1) requestAnimationFrame(step);
+        else el.textContent = target.toLocaleString();
+      }
+      requestAnimationFrame(step);
+    }
+
+    // Intersection observer so count starts when element scrolls into view
+    var counterEl = document.getElementById('counter-downloads');
+    var counted = false;
+    var downloadsTarget = null;
+
+    function tryStart() {
+      if (!counted && downloadsTarget !== null) {
+        counted = true;
+        animateCount(counterEl, downloadsTarget);
+      }
+    }
+
+    var observer = new IntersectionObserver(function(entries) {
+      if (entries[0].isIntersecting) {
+        tryStart();
+        observer.disconnect();
+      }
+    }, { threshold: 0.3 });
+    observer.observe(counterEl);
+
+    // Fetch npm download count
+    (function() {
       var today = new Date();
-      var end = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
-      // Changed start date from 2026 to 2020 to ensure valid range for API
+      var end = today.getFullYear() + '-' +
+        String(today.getMonth() + 1).padStart(2, '0') + '-' +
+        String(today.getDate()).padStart(2, '0');
       var url = 'https://api.npmjs.org/downloads/point/2020-01-01:' + end + '/giman';
-      
+
       fetch(url)
-        .then(function (r) { return r.json(); })
-        .then(function (data) {
-          el.classList.remove('animate-pulse-slow');
-          if (data.downloads != null) {
-            el.textContent = data.downloads.toLocaleString();
-            row.title = "Total downloads since 2020";
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          if (data.downloads != null && data.downloads > 0) {
+            downloadsTarget = data.downloads;
+            tryStart();
           } else {
-            el.textContent = '—';
+            counterEl.textContent = '—';
           }
         })
-        .catch(function () {
-          el.classList.remove('animate-pulse-slow');
-          el.textContent = '—';
+        .catch(function() {
+          counterEl.textContent = '—';
         });
     })();
   </script>

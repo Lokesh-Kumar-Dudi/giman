@@ -102,7 +102,11 @@ export async function promptIdentityFields(existing?: Partial<Identity>): Promis
       name: 'sshHost',
       message: 'SSH host alias (used in clone URLs, e.g. github-personal):',
       default: existing?.sshHost ?? ((ans: { id?: string }) => (ans?.id ? `github-${ans.id}` : undefined)),
-      validate: (v: string) => (v?.trim() ? true : 'SSH host alias is required'),
+      validate: (v: string) => {
+        if (!v?.trim()) return 'SSH host alias is required';
+        if (!/^[a-zA-Z0-9._-]+$/.test(v.trim())) return 'SSH host alias must contain only letters, numbers, dot, and hyphen (no spaces or special characters)';
+        return true;
+      },
     },
   ]);
   return answers as { id: string; name: string; email: string; sshHost: string };
