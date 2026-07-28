@@ -89,14 +89,16 @@ gid status
 | `gid status`                        | Show active identity for the current directory                       |
 | `gid apply`                         | Apply config to `~/.gitconfig` and `~/.ssh/config`                   |
 | `gid clone <repo-url> [directory]`  | Clone a repo; prompts to select identity (profile) for the clone     |
-| `gid identity list`                 | List all identities                                                  |
-| `gid identity add`                  | Add a new identity (interactive)                                     |
-| `gid identity edit <id>`            | Edit an existing identity                                            |
-| `gid identity remove <id>`          | Remove an identity                                                   |
-| `gid identity show <id>`            | Show details for one identity                                        |
+| `gid id list`                       | List all identities                                                  |
+| `gid id add`                        | Add a new identity (interactive)                                     |
+| `gid id edit <id>`                  | Edit an existing identity                                            |
+| `gid id remove <id>`                | Remove an identity                                                   |
+| `gid id show <id>`                  | Show details for one identity                                        |
 | `gid dir add <path> --identity <id>`| Map a directory to an identity                                       |
 | `gid dir remove <path>`             | Remove a directory mapping                                           |
 | `gid dir list`                      | List all directory mappings                                          |
+
+> **Note:** `gid id` was previously named `gid identity`. The old name still works as an alias, so existing scripts keep running, but `gid id` is the documented form.
 
 
   
@@ -167,7 +169,7 @@ gid  status
 
   
 
-**When to use:** After you’ve added/edited identities or directory mappings (e.g. via `gid identity add`, `gid dir add`, or by editing the JSON) and want those changes to take effect. Also useful if you manually changed `~/.ssh/config` or `~/.gitconfig` and want to re-sync from GiMan.
+**When to use:** After you’ve added/edited identities or directory mappings (e.g. via `gid id add`, `gid dir add`, or by editing the JSON) and want those changes to take effect. Also useful if you manually changed `~/.ssh/config` or `~/.gitconfig` and want to re-sync from GiMan.
 
   
 
@@ -207,7 +209,7 @@ gid  clone  git@github.com:someone/repo.git  ./my-repo
 
   
 
-### `gid identity list`
+### `gid id list`
 
   
 
@@ -220,7 +222,7 @@ gid  clone  git@github.com:someone/repo.git  ./my-repo
   
 
 ```bash
-gid  identity  list
+gid  id  list
 ```
 
   
@@ -229,7 +231,7 @@ gid  identity  list
 
   
 
-### `gid identity add`
+### `gid id add`
 
   
 
@@ -242,7 +244,7 @@ gid  identity  list
   
 
 ```bash
-gid  identity  add
+gid  id  add
 ```
 
   
@@ -251,7 +253,7 @@ gid  identity  add
 
   
 
-### `gid identity edit <id>`
+### `gid id edit <id>`
 
   
 
@@ -264,7 +266,7 @@ gid  identity  add
   
 
 ```bash
-gid  identity  edit  work
+gid  id  edit  work
 ```
 
   
@@ -273,7 +275,7 @@ gid  identity  edit  work
 
   
 
-### `gid identity remove <id>`
+### `gid id remove <id>`
 
   
 
@@ -286,7 +288,7 @@ gid  identity  edit  work
   
 
 ```bash
-gid  identity  remove  work
+gid  id  remove  work
 ```
 
   
@@ -295,7 +297,7 @@ gid  identity  remove  work
 
   
 
-### `gid identity show <id>`
+### `gid id show <id>`
 
   
 
@@ -308,7 +310,7 @@ gid  identity  remove  work
   
 
 ```bash
-gid  identity  show  personal
+gid  id  show  personal
 ```
 
   
@@ -321,7 +323,7 @@ gid  identity  show  personal
 
   
 
-**What it does:** Maps a **directory path** to an identity. Any repo inside that path (including subdirectories) will use that identity’s `user.name`, `user.email`, and SSH key. Path can be absolute or use `~`; `.` means current directory. The identity must already exist (from `gid init` or `gid identity add`).
+**What it does:** Maps a **directory path** to an identity. Any repo inside that path (including subdirectories) will use that identity’s `user.name`, `user.email`, and SSH key. Path can be absolute or use `~`; `.` means current directory. The identity must already exist (from `gid init` or `gid id add`).
 
   
 
@@ -498,9 +500,9 @@ git  remote  -v
   
 
 ```bash
-gid  identity  list
+gid  id  list
 
-gid  identity  show  personal
+gid  id  show  personal
 
 gid  dir  list
 
@@ -519,7 +521,7 @@ gid  status
 
 -  **GiMan config:**  `~/.giman/config.json` (identities, SSH key paths, directory mappings).
 
--  **Git:**  `~/.gitconfig` gets `includeIf` directives when you run `gid init`, `gid identity add`, `gid dir add`, or `gid apply`.
+-  **Git:**  `~/.gitconfig` gets `includeIf` directives when you run `gid init`, `gid id add`, `gid dir add`, or `gid apply`.
 
 -  **SSH:**  `~/.ssh/config` gets `Host` blocks for each identity (e.g. `github-personal`, `github-work`) when you run those commands (with your permission).
 

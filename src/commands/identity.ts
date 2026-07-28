@@ -23,7 +23,10 @@ function toTildePath(p: string): string {
 }
 
 export function registerIdentityCommands(program: Command): void {
-  const identity = program.command('identity').description('Manage git identities');
+  const identity = program
+    .command('id')
+    .alias('identity')
+    .description('Manage git identities');
 
   identity
     .command('list')
@@ -33,7 +36,7 @@ export function registerIdentityCommands(program: Command): void {
       if (identities.length === 0) {
         section('Identities');
         info('No identities configured yet.');
-        console.log('  Run ' + chalk.cyan('gid init') + ' or ' + chalk.cyan('gid identity add') + ' to get started.');
+        console.log('  Run ' + chalk.cyan('gid init') + ' or ' + chalk.cyan('gid id add') + ' to get started.');
         return;
       }
       section('Identities');
@@ -92,7 +95,7 @@ export function registerIdentityCommands(program: Command): void {
     .action(async (id: string) => {
       const existing = await getIdentity(id);
       if (!existing) {
-        failure('Identity not found', `"${id}" is not in your config. Use gid identity list to see identities.`);
+        failure('Identity not found', `"${id}" is not in your config. Use gid id list to see identities.`);
         process.exit(1);
       }
       section('Edit identity: ' + id);
@@ -115,7 +118,7 @@ export function registerIdentityCommands(program: Command): void {
     .action(async (id: string) => {
       const existing = await getIdentity(id);
       if (!existing) {
-        failure('Identity not found', `"${id}" is not in your config. Use gid identity list to see identities.`);
+        failure('Identity not found', `"${id}" is not in your config. Use gid id list to see identities.`);
         process.exit(1);
       }
       await withSpinner(
@@ -144,7 +147,7 @@ export function registerIdentityCommands(program: Command): void {
     .action(async (id: string) => {
       const i = await getIdentity(id);
       if (!i) {
-        failure('Identity not found', `"${id}" is not in your config. Use gid identity list to see identities.`);
+        failure('Identity not found', `"${id}" is not in your config. Use gid id list to see identities.`);
         process.exit(1);
       }
       section('Identity: ' + i.id);
