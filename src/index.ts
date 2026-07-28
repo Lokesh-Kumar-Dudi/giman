@@ -7,12 +7,14 @@ import { runStatus } from './commands/status.js';
 import { runApply } from './commands/apply.js';
 import { runClone } from './commands/clone.js';
 
+const { version } = require('../package.json') as { version: string };
+
 const program = new Command();
 
 program
   .name('gid')
   .description('GiMan - manage multiple git identities via SSH')
-  .version('1.0.0');
+  .version(version);
 
 program.command('init').description('Interactive setup; detects existing config').action(runInit);
 program.command('status').description('Show current identity for current directory').action(runStatus);
