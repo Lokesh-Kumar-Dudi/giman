@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GiMan (gid) — Documentation</title>
+  <meta name="description" content="GiMan documentation — multiple Git identities via SSH. Install, configure, and manage personal and work GitHub accounts on one machine." />
+  <meta name="theme-color" content="#F4F4F0" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* ==========================================================================
+       GIMAN® DOCS — INDUSTRIAL PRINT SYSTEM / REV 1.0.5
+       Substrate: unbleached documentation paper. Ink: carbon. Accent: aviation red.
+       Constraints: zero border-radius, zero gradients on chrome, single accent.
+       ========================================================================== */
+
+    :root {
+      --paper:      #F4F4F0;
+      --paper-2:    #EAE8E3;
+      --paper-3:    #DEDBD4;
+      --ink:        #050505;
+      --ink-2:      #111111;
+      --ink-mute:   #6E6B64;
+      --ink-faint:  #9C988F;
+      --red:        #E61919;
+
+      /* inverted panels (solid ink blocks) */
+      --on-ink:      #F4F4F0;
+      --on-ink-mute: #8B8880;
+
+      --rule:      1px solid var(--ink);
+      --rule-2:    2px solid var(--ink);
+      --rule-soft: 1px solid var(--paper-3);
+
+      --pad:  clamp(1.25rem, 4vw, 4rem);
+      --pad-y: clamp(3rem, 7vw, 6.5rem);
+
+      --sans: 'Inter', system-ui, -apple-system, sans-serif;
+      --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+      --display: 'Archivo Black', 'Inter', sans-serif;
+
+      --sidebar-w: 16rem;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; border-radius: 0 !important; }
+
+    html { scroll-behavior: smooth; scroll-padding-top: 4.5rem; -webkit-text-size-adjust: 100%; }
+
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 16px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* --- Mechanical noise --- */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      pointer-events: none;
+      opacity: .34;
+      mix-blend-mode: multiply;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+    }
+
+    ::selection { background: var(--red); color: var(--paper); }
+
+    a { color: inherit; text-decoration: none; }
+    :focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
+
+    /* ==================== TYPOGRAPHY ==================== */
+
+    .macro {
+      font-family: var(--display);
+      font-weight: 400;
+      text-transform: uppercase;
+      letter-spacing: -0.045em;
+      line-height: 0.86;
+      margin: 0;
+    }
+    .macro--l  { font-size: clamp(2.1rem, 6.2vw, 4.6rem); letter-spacing: -0.04em; }
+    .macro--m  { font-size: clamp(1.5rem, 3.4vw, 2.5rem); letter-spacing: -0.035em; line-height: 0.92; }
+
+    .mono {
+      font-family: var(--mono);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.11em;
+      line-height: 1.3;
+    }
+    .mono--sm { font-size: 0.625rem; letter-spacing: 0.14em; }
+    .mono--md { font-size: 0.75rem; letter-spacing: 0.09em; }
+
+    .c-red   { color: var(--red); }
+    .c-mute  { color: var(--ink-mute); }
+    .c-faint { color: var(--ink-faint); }
+
+    .ic {
+      font-size: 0.85em;
+      background: var(--paper-2);
+      border: var(--rule-soft);
+      padding: 0.05em 0.3em;
+      color: var(--ink);
+      white-space: nowrap;
+    }
+
+    code, samp, kbd, pre { font-family: var(--mono); font-variant-ligatures: none; }
+
+    /* ==================== MASTHEAD ==================== */
+
+    .masthead {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--paper);
+      border-bottom: var(--rule);
+    }
+    .masthead-in {
+      max-width: 1480px; margin: 0 auto;
+      border-left: var(--rule); border-right: var(--rule);
+      display: flex; align-items: stretch; justify-content: space-between;
+      min-height: 3.25rem;
+    }
+    .wordmark {
+      display: flex; align-items: center; gap: 0.4rem;
+      font-family: var(--display); font-size: 1rem; text-transform: uppercase;
+      letter-spacing: -0.03em; padding: 0 var(--pad); border-right: var(--rule);
+    }
+    .wordmark sup { font-family: var(--mono); font-size: 0.5rem; font-weight: 700; top: -0.7em; }
+
+    .mast-status {
+      display: flex; align-items: center; gap: 0.6rem;
+      padding: 0 var(--pad); border-right: var(--rule);
+      font-family: var(--mono); font-size: 0.625rem; font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.14em; color: var(--ink-faint);
+      white-space: nowrap; overflow: hidden;
+    }
+    .mast-status .dot { width: 6px; height: 6px; background: var(--red); flex: none; }
+    @media (max-width: 620px) { .mast-status { display: none; } }
+
+    .nav-idx { display: flex; align-items: stretch; margin-left: auto; }
+    .nav-idx a {
+      display: flex; align-items: center; gap: 0.4rem;
+      padding: 0 1rem; border-left: var(--rule);
+      font-family: var(--mono); font-size: 0.625rem; font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.14em;
+      transition: background .12s linear, color .12s linear;
+    }
+    .nav-idx a:hover { background: var(--ink); color: var(--paper); }
+    .nav-idx a:hover .nav-n { color: var(--red); }
+    .nav-n { color: var(--ink-faint); font-weight: 700; }
+    .nav-idx a.is-src { background: var(--red); border-left-color: var(--red); color: var(--paper); }
+    .nav-idx a.is-src:hover { background: var(--ink); border-left-color: var(--ink); }
+    .nav-idx a.is-src:hover .nav-n { color: var(--red); }
+
+    /* ==================== DOCS LAYOUT ==================== */
+
+    .docs-frame {
+      max-width: 1480px;
+      margin: 0 auto;
+      border-left: var(--rule);
+      border-right: var(--rule);
+      display: flex;
+      min-height: calc(100vh - 3.25rem);
+    }
+
+    /* --- Sidebar --- */
+
+    .sidebar {
+      width: var(--sidebar-w);
+      flex: none;
+      border-right: var(--rule);
+      position: sticky;
+      top: 3.25rem;
+      height: calc(100vh - 3.25rem);
+      overflow-y: auto;
+      background: var(--paper);
+      z-index: 50;
+      padding: 1.5rem 0;
+    }
+
+    .sidebar-label {
+      font-family: var(--mono); font-size: 0.5625rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.18em;
+      color: var(--ink-faint); padding: 0 1rem 0.75rem;
+    }
+
+    .sidebar-nav { list-style: none; margin: 0; padding: 0; }
+
+    .sidebar-nav li { margin: 0; }
+
+    .sidebar-nav a {
+      display: block;
+      padding: 0.38rem 1rem;
+      font-family: var(--mono); font-size: 0.6875rem; font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--ink-mute);
+      border-left: 3px solid transparent;
+      transition: color .12s linear, background .12s linear, border-color .12s linear;
+    }
+    .sidebar-nav a:hover { background: var(--paper-2); color: var(--ink); }
+
+    .sidebar-nav a.active,
+    .sidebar-nav a[aria-current="true"] {
+      color: var(--red);
+      border-left-color: var(--red);
+      background: var(--paper-2);
+      font-weight: 700;
+    }
+
+    /* Sub-items (indented) */
+    .sidebar-sub { list-style: none; margin: 0; padding: 0; }
+
+    .sidebar-sub a {
+      padding-left: 2rem;
+      font-size: 0.625rem;
+      letter-spacing: 0.06em;
+      color: var(--ink-faint);
+    }
+
+    .sidebar-cat {
+      font-family: var(--mono); font-size: 0.5rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.2em;
+      color: var(--ink-faint); padding: 1rem 1rem 0.35rem;
+    }
+    .sidebar-cat:first-of-type { padding-top: 0.25rem; }
+
+    /* Tree toggle button */
+    .sidebar-tree-toggle {
+      display: block; width: 100%;
+      font-family: var(--mono); font-size: 0.625rem; font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--ink-mute);
+      background: none; border: none; cursor: pointer;
+      padding: 0.45rem 1rem;
+      text-align: left;
+      transition: color .12s linear, background .12s linear;
+    }
+    .sidebar-tree-toggle:hover { background: var(--paper-2); color: var(--ink); }
+    .tree-arrow {
+      display: inline-block; width: 1em; margin-right: 0.15em;
+      font-size: 0.85em; transition: transform .15s linear;
+    }
+    .sidebar-tree-toggle[aria-expanded="true"] .tree-arrow { transform: rotate(90deg); }
+    .sidebar-tree-toggle + .sidebar-sub {
+      overflow: hidden;
+    }
+    .sidebar-tree-toggle + .sidebar-sub { max-height: 30rem; transition: max-height .2s ease; }
+    .sidebar-tree-toggle[aria-expanded="false"] + .sidebar-sub { max-height: 0; }
+
+    .sidebar-divider {
+      height: 1px;
+      background: var(--paper-3);
+      margin: 0.75rem 0;
+    }
+
+    /* --- Main content --- */
+
+    .content {
+      flex: 1;
+      min-width: 0;
+      padding: var(--pad-y) var(--pad);
+    }
+
+    .content-section {
+      margin-bottom: clamp(3rem, 6vw, 5rem);
+    }
+    .content-section:last-child { margin-bottom: 0; }
+
+    .content-section h2 {
+      font-family: var(--display);
+      font-weight: 400;
+      text-transform: uppercase;
+      letter-spacing: -0.04em;
+      line-height: 0.92;
+      font-size: clamp(1.5rem, 3.4vw, 2.5rem);
+      margin: 0 0 0.5rem;
+      scroll-margin-top: 4.5rem;
+    }
+
+    .content-section h3 {
+      font-family: var(--display);
+      font-weight: 400;
+      text-transform: uppercase;
+      letter-spacing: -0.035em;
+      line-height: 0.94;
+      font-size: clamp(1.1rem, 2vw, 1.5rem);
+      margin: 2.5rem 0 0.75rem;
+      padding-top: 0.75rem;
+      border-top: var(--rule-soft);
+      scroll-margin-top: 4.5rem;
+    }
+
+    .heading-anchor {
+      opacity: 0;
+      margin-left: .5em;
+      font-family: var(--mono); font-size: 0.75em; font-weight: 500;
+      color: var(--ink-faint);
+      transition: opacity .14s linear, color .14s linear;
+      vertical-align: 0;
+    }
+    .content-section h3:hover .heading-anchor,
+    .content-section h2:hover .heading-anchor { opacity: 1; }
+    .heading-anchor:hover { color: var(--red); }
+
+    .content-section h4 {
+      font-size: 0.9375rem;
+      font-weight: 700;
+      letter-spacing: -0.015em;
+      margin: 1.5rem 0 0.5rem;
+      text-transform: uppercase;
+    }
+
+    .content-section p {
+      font-size: 0.9375rem;
+      line-height: 1.6;
+      color: var(--ink-mute);
+      max-width: 88ch;
+      margin: 0 0 0.9rem;
+    }
+    .content-section p strong { color: var(--ink); font-weight: 600; }
+
+    .content-section ul, .content-section ol {
+      font-size: 0.9375rem;
+      line-height: 1.6;
+      color: var(--ink-mute);
+      max-width: 88ch;
+      margin: 0 0 0.9rem;
+      padding-left: 1.4rem;
+    }
+    .content-section li { margin-bottom: 0.3rem; }
+
+    /* --- Code blocks --- */
+
+    .code-block {
+      border: var(--rule);
+      background: var(--ink);
+      color: var(--on-ink);
+      margin: 0.9rem 0;
+      font-family: var(--mono);
+      font-size: 0.8125rem;
+      line-height: 1.7;
+      padding: 0;
+      overflow-x: auto;
+      max-width: 60rem;
+    }
+    .code-block pre {
+      margin: 0;
+      padding: 1rem 1.2rem;
+      font-family: inherit;
+      font-size: inherit;
+      line-height: inherit;
+    }
+
+    /* --- Tables --- */
+
+    .tbl-wrap { border: var(--rule); overflow-x: auto; margin: 0.9rem 0; max-width: 60rem; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+      line-height: 1.5;
+    }
+    table th {
+      text-align: left;
+      font-family: var(--mono); font-size: 0.5625rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.18em; color: var(--paper);
+      background: var(--ink); padding: 0.7rem 1rem; white-space: nowrap;
+    }
+    table td {
+      border-top: var(--rule-soft);
+      padding: 0.7rem 1rem;
+      vertical-align: top;
+      color: var(--ink-mute);
+    }
+    table td:first-child { font-family: var(--mono); font-size: 0.8125rem; color: var(--ink); font-weight: 700; white-space: nowrap; }
+    table tbody tr:hover { background: var(--paper-2); }
+
+    /* --- Blockquote --- */
+
+    .content-section blockquote {
+      margin: 0.9rem 0;
+      padding: 0.6rem 0 0.6rem 0.9rem;
+      border-left: 3px solid var(--red);
+      font-size: 0.8125rem;
+      line-height: 1.55;
+      color: var(--ink-mute);
+      max-width: 60rem;
+    }
+    .content-section blockquote code { font-size: 0.9em; }
+
+    /* --- Divider --- */
+
+    .content-hr {
+      border: 0;
+      border-top: var(--rule);
+      margin: 2.5rem 0;
+    }
+
+    /* --- Scrollbar for sidebar --- */
+    .sidebar::-webkit-scrollbar { width: 6px; }
+    .sidebar::-webkit-scrollbar-track { background: var(--paper-2); }
+    .sidebar::-webkit-scrollbar-thumb { background: var(--paper-3); }
+
+    /* ==================== RESPONSIVE ==================== */
+
+    @media (max-width: 860px) {
+      .sidebar {
+        position: fixed;
+        top: 3.25rem;
+        left: 0;
+        bottom: 0;
+        z-index: 90;
+        transform: translateX(-100%);
+        transition: transform .18s linear;
+        box-shadow: 2px 0 12px rgba(0,0,0,.12);
+      }
+      .sidebar.open { transform: translateX(0); }
+      .sidebar-overlay {
+        display: none;
+        position: fixed; inset: 0; z-index: 89;
+        background: rgba(5,5,5,.22);
+      }
+      .sidebar-overlay.open { display: block; }
+      .sidebar-toggle {
+        display: flex;
+        align-items: center; gap: 0.35rem;
+        padding: 0 1rem; border-left: var(--rule);
+        font-family: var(--mono); font-size: 0.625rem; font-weight: 500;
+        text-transform: uppercase; letter-spacing: 0.14em;
+        background: none; color: var(--ink); cursor: pointer;
+        transition: background .12s linear, color .12s linear;
+      }
+      .sidebar-toggle:hover { background: var(--ink); color: var(--paper); }
+      .content { padding: clamp(1.5rem, 5vw, 2.5rem) clamp(1rem, 3vw, 2rem); }
+    }
+
+    @media (min-width: 861px) {
+      .sidebar-toggle, .sidebar-overlay { display: none; }
+    }
+
+    /* ==================== FOOTER ==================== */
+
+    .foot { background: var(--ink); color: var(--on-ink); }
+    .foot-in { max-width: 1480px; margin: 0 auto; border-left: var(--rule); border-right: var(--rule); }
+    .foot-mark { padding: clamp(2rem, 5vw, 3.5rem) var(--pad) clamp(1.5rem, 3vw, 2rem); border-bottom: 1px solid #2A2A28; }
+    .foot-mark .macro { font-size: clamp(3.5rem, 17vw, 14rem); color: var(--on-ink); }
+    .foot-mark .macro sup { font-family: var(--mono); font-size: 0.14em; font-weight: 700; color: var(--red); top: -1.9em; letter-spacing: 0; }
+    .foot-grid { display: grid; grid-template-columns: 1fr; }
+    @media (min-width: 780px) { .foot-grid { grid-template-columns: 1.4fr 1fr; } }
+    .foot-cell { padding: clamp(1.4rem, 3vw, 2rem) var(--pad); }
+    .foot-cell + .foot-cell { border-top: 1px solid #2A2A28; }
+    @media (min-width: 780px) { .foot-cell + .foot-cell { border-top: 0; border-left: 1px solid #2A2A28; } }
+    .foot-links { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .foot-links a {
+      font-family: var(--mono); font-size: 0.625rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.14em;
+      border: 1px solid #2A2A28; padding: 0.55rem 0.9rem;
+      transition: background .12s linear, color .12s linear, border-color .12s linear;
+    }
+    .foot-links a:hover { background: var(--red); border-color: var(--red); color: var(--paper); }
+    .foot-note { font-family: var(--mono); font-size: 0.625rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--on-ink-mute); line-height: 1.8; }
+    .foot-note .c-red { color: var(--red); }
+
+  </style>
+</head>
+<body>
+
+<!-- ============================ MASTHEAD ============================ -->
+<header class="masthead">
+  <div class="masthead-in">
+    <a class="wordmark" href="index.html">GiMan<sup>®</sup></a>
+    <div class="mast-status" aria-hidden="true">
+      <span class="dot"></span>
+      <span>Rev 1.0.5</span>
+      <span>·</span>
+      <span>MIT</span>
+      <span>·</span>
+      <span>Node ≥ 18</span>
+    </div>
+    <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle navigation">
+      <span>☰</span> <span>Nav</span>
+    </button>
+    <nav class="nav-idx" aria-label="Section index">
+      <a class="is-src" href="https://github.com/Lokesh-Kumar-Dudi/giman" target="_blank" rel="noopener">Source ↗</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ============================ DOCS LAYOUT ============================ -->
+<div class="docs-frame">
+
+  <!-- Sidebar -->
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-label">Documentation</div>
+    <ul class="sidebar-nav">
+      <li><a href="#install">Install</a></li>
+      <li><a href="#quick-start">Quick start</a></li>
+      <li class="sidebar-divider"></li>
+      <li class="sidebar-cat">Commands</li>
+      <li>
+        <button class="sidebar-tree-toggle" aria-expanded="true"><span class="tree-arrow">▸</span> Setup</button>
+        <ul class="sidebar-sub">
+          <li><a href="#gid-init">gid init</a></li>
+          <li><a href="#gid-apply">gid apply</a></li>
+        </ul>
+      </li>
+      <li>
+        <button class="sidebar-tree-toggle" aria-expanded="true"><span class="tree-arrow">▸</span> Identities</button>
+        <ul class="sidebar-sub">
+          <li><a href="#gid-id-list">gid id list</a></li>
+          <li><a href="#gid-id-add">gid id add</a></li>
+          <li><a href="#gid-id-edit">gid id edit</a></li>
+          <li><a href="#gid-id-remove">gid id remove</a></li>
+          <li><a href="#gid-id-show">gid id show</a></li>
+        </ul>
+      </li>
+      <li>
+        <button class="sidebar-tree-toggle" aria-expanded="true"><span class="tree-arrow">▸</span> Directories</button>
+        <ul class="sidebar-sub">
+          <li><a href="#gid-dir-add">gid dir add</a></li>
+          <li><a href="#gid-dir-remove">gid dir remove</a></li>
+          <li><a href="#gid-dir-list">gid dir list</a></li>
+        </ul>
+      </li>
+      <li>
+        <button class="sidebar-tree-toggle" aria-expanded="true"><span class="tree-arrow">▸</span> Usage</button>
+        <ul class="sidebar-sub">
+          <li><a href="#gid-status">gid status</a></li>
+          <li><a href="#gid-clone">gid clone</a></li>
+        </ul>
+      </li>
+      <li><a href="#commands-reference">Commands table ↗</a></li>
+      <li class="sidebar-divider"></li>
+      <li><a href="#examples">Examples</a></li>
+      <li><a href="#config-location">Config location</a></li>
+      <li><a href="#license">License</a></li>
+    </ul>
+  </aside>
+
+  <!-- Main content -->
+  <main class="content">
+
+    <!-- Title -->
+    <h1 class="macro macro--l" style="margin:0 0 0.25rem">Documentation</h1>
+    <p class="mono c-faint" style="margin:0 0 clamp(1.5rem,3vw,2.5rem)">
+      GiMan (gid) · Multiple Git identities via SSH
+    </p>
+
+    <!-- Install -->
+    <section class="content-section" id="install">
+      <h2>Install</h2>
+      <div class="code-block"><pre>npm install -g giman</pre></div>
+      <p>Requires <strong>Node.js 18+</strong>.</p>
+    </section>
+
+    <hr class="content-hr">
+
+    <!-- Quick start -->
+    <section class="content-section" id="quick-start">
+      <h2>Quick start</h2>
+      <ol>
+        <li><strong>Initialize</strong> (creates <code class="ic">~/.giman/config.json</code>, detects existing config):</li>
+      </ol>
+      <div class="code-block"><pre>gid init</pre></div>
+      <ol start="2">
+        <li><strong>Map directories</strong> to identities so Git uses the right identity per folder:</li>
+      </ol>
+      <div class="code-block"><pre>gid dir add ~/dev/personal --identity personal
+gid dir add ~/dev/work --identity work</pre></div>
+      <ol start="3">
+        <li><strong>Check current identity</strong> in the current directory:</li>
+      </ol>
+      <div class="code-block"><pre>gid status</pre></div>
+    </section>
+
+    <hr class="content-hr">
+
+    <!-- Commands reference -->
+    <section class="content-section" id="commands-reference">
+      <h2>Commands reference</h2>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr><th>Command</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>gid init</code></td><td>Interactive setup and config detection</td></tr>
+            <tr><td><code>gid status</code></td><td>Show active identity for the current directory</td></tr>
+            <tr><td><code>gid apply</code></td><td>Apply config to <code class="ic">~/.gitconfig</code> and <code class="ic">~/.ssh/config</code></td></tr>
+            <tr><td><code>gid clone &lt;repo-url&gt; [directory]</code></td><td>Clone a repo; prompts to select identity (profile) for the clone</td></tr>
+            <tr><td><code>gid id list</code></td><td>List all identities</td></tr>
+            <tr><td><code>gid id add</code></td><td>Add a new identity (interactive)</td></tr>
+            <tr><td><code>gid id edit &lt;id&gt;</code></td><td>Edit an existing identity</td></tr>
+            <tr><td><code>gid id remove &lt;id&gt;</code></td><td>Remove an identity</td></tr>
+            <tr><td><code>gid id show &lt;id&gt;</code></td><td>Show details for one identity</td></tr>
+            <tr><td><code>gid dir add &lt;path&gt; --identity &lt;id&gt;</code></td><td>Map a directory to an identity</td></tr>
+            <tr><td><code>gid dir remove &lt;path&gt;</code></td><td>Remove a directory mapping</td></tr>
+            <tr><td><code>gid dir list</code></td><td>List all directory mappings</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <blockquote>
+        <strong>Note:</strong> <code>gid id</code> was previously named <code>gid identity</code>. The old name still works as an alias, so existing scripts keep running, but <code>gid id</code> is the documented form.
+      </blockquote>
+    </section>
+
+    <hr class="content-hr">
+
+    <!-- Command details -->
+    <section class="content-section" id="command-details">
+      <h2 style="margin-bottom:1.5rem">Command details</h2>
+
+      <h3 id="gid-init"><code>gid init</code><a class="heading-anchor" href="#gid-init">#</a></h3>
+      <p>One-time interactive setup. If you don't have config yet, it walks you through creating your first identity (ID, name, email, SSH key path, SSH host alias). It then creates <code class="ic">~/.giman/config.json</code>, writes per-identity Git configs, updates <code class="ic">~/.gitconfig</code> with <code class="ic">includeIf</code> rules, and optionally updates <code class="ic">~/.ssh/config</code> with Host blocks.</p>
+      <p><strong>If config already exists:</strong> It detects your existing identities and asks whether to apply them now (write to <code class="ic">~/.ssh/config</code> and <code class="ic">~/.gitconfig</code>). Use this after cloning your config to a new machine or to re-apply after manual edits.</p>
+      <p>First time setup, or after moving to a new machine. Run once before using other commands.</p>
+      <div class="code-block"><pre>gid init</pre></div>
+
+      <h3 id="gid-status"><code>gid status</code><a class="heading-anchor" href="#gid-status">#</a></h3>
+      <p>Shows which identity is active for your <strong>current working directory</strong>. It looks up your CWD in the directory mappings and prints the matching identity (id, name, email), or tells you no identity is mapped and suggests <code class="ic">gid dir add . --identity &lt;id&gt;</code>.</p>
+      <p>To confirm which account Git will use for commits and SSH in the current folder.</p>
+      <div class="code-block"><pre>cd ~/dev/work/project
+gid status
+# Identity: work — John Doe &lt;john@company.com&gt;</pre></div>
+
+      <h3 id="gid-apply"><code>gid apply</code><a class="heading-anchor" href="#gid-apply">#</a></h3>
+      <p>Writes the <strong>current</strong> state of <code class="ic">~/.giman/config.json</code> out to the system: updates <code class="ic">~/.ssh/config</code> (Host blocks for each identity), writes identity gitconfigs under <code class="ic">~/.giman/gitconfigs</code>, and refreshes <code class="ic">~/.gitconfig</code> includeIf rules. It will prompt before modifying <code class="ic">~/.ssh/config</code>.</p>
+      <p>After you've added/edited identities or directory mappings (e.g. via <code class="ic">gid id add</code>, <code class="ic">gid dir add</code>, or by editing the JSON) and want those changes to take effect. Also useful if you manually changed <code class="ic">~/.ssh/config</code> or <code class="ic">~/.gitconfig</code> and want to re-sync from GiMan.</p>
+      <div class="code-block"><pre>gid apply</pre></div>
+
+      <h3 id="gid-clone"><code>gid clone &lt;repo-url&gt; [directory]</code><a class="heading-anchor" href="#gid-clone">#</a></h3>
+      <p>Clones a repository using an SSH URL (e.g. <code class="ic">git@github.com:user/repo.git</code>). Prompts you to <strong>select an identity (profile)</strong> from your configured identities; then rewrites the URL to use that identity's SSH host alias and runs <code class="ic">git clone</code>. Optional second argument is the target directory (same as <code class="ic">git clone &lt;url&gt; [directory]</code>).</p>
+      <p>When you want to clone a repo and have GiMan prompt you to pick which account/identity to use, without remembering or typing the SSH host alias.</p>
+      <div class="code-block"><pre>gid clone git@github.com:someone/repo.git
+# Prompts: Select identity (profile) for this clone: personal / work / ...
+
+gid clone git@github.com:someone/repo.git ./my-repo
+# Same, but clones into ./my-repo</pre></div>
+
+      <h3 id="gid-id-list"><code>gid id list</code><a class="heading-anchor" href="#gid-id-list">#</a></h3>
+      <p>Lists every identity in your config. For each identity it shows: id, name, email, SSH key path (tilde form), SSH host alias, and which directories are mapped to it.</p>
+      <p>To see all identities and their mappings at a glance.</p>
+      <div class="code-block"><pre>gid id list</pre></div>
+
+      <h3 id="gid-id-add"><code>gid id add</code><a class="heading-anchor" href="#gid-id-add">#</a></h3>
+      <p>Interactive flow to add a <strong>new</strong> identity. Prompts for: identity ID (e.g. <code class="ic">personal</code>, <code class="ic">work</code>), display name, email, and SSH key (path or generate new). Saves to config and optionally updates <code class="ic">~/.ssh/config</code>. The new identity has no directories until you run <code class="ic">gid dir add</code>.</p>
+      <p>When you need a second (or third) GitHub account or Git identity on the same machine.</p>
+      <div class="code-block"><pre>gid id add</pre></div>
+
+      <h3 id="gid-id-edit"><code>gid id edit &lt;id&gt;</code><a class="heading-anchor" href="#gid-id-edit">#</a></h3>
+      <p>Edits an existing identity by <strong>id</strong>. Prompts for name, email, and SSH host alias (existing values pre-filled). Updates only those fields in config; it does <strong>not</strong> change the SSH key path. After editing, run <code class="ic">gid apply</code> if you want SSH/gitconfig rewritten immediately.</p>
+      <p>You changed your name/email or want to rename the SSH host alias (e.g. <code class="ic">github-work</code> → <code class="ic">github-company</code>).</p>
+      <div class="code-block"><pre>gid id edit work</pre></div>
+
+      <h3 id="gid-id-remove"><code>gid id remove &lt;id&gt;</code><a class="heading-anchor" href="#gid-id-remove">#</a></h3>
+      <p>Removes the identity with the given <strong>id</strong> from config and removes all directory mappings that pointed to it. Then rewrites <code class="ic">~/.ssh/config</code> so that Host block is gone.</p>
+      <p>You no longer use that account or identity on this machine.</p>
+      <div class="code-block"><pre>gid id remove work</pre></div>
+
+      <h3 id="gid-id-show"><code>gid id show &lt;id&gt;</code><a class="heading-anchor" href="#gid-id-show">#</a></h3>
+      <p>Prints full details for one identity: name, email, SSH key path, SSH host alias, and the list of directories mapped to it. Exits with an error if the id doesn't exist.</p>
+      <p>To double-check one identity's settings and which paths use it.</p>
+      <div class="code-block"><pre>gid id show personal</pre></div>
+
+      <h3 id="gid-dir-add"><code>gid dir add &lt;path&gt; --identity &lt;id&gt;</code><a class="heading-anchor" href="#gid-dir-add">#</a></h3>
+      <p>Maps a <strong>directory path</strong> to an identity. Any repo inside that path (including subdirectories) will use that identity's <code class="ic">user.name</code>, <code class="ic">user.email</code>, and SSH key. Path can be absolute or use <code class="ic">~</code>; <code class="ic">.</code> means current directory. The identity must already exist (from <code class="ic">gid init</code> or <code class="ic">gid id add</code>).</p>
+      <p><strong>Options:</strong> <code class="ic">-i, --identity &lt;id&gt;</code> (required) — the identity id to attach the path to.</p>
+      <p>When you want "everything under this folder" to use a specific account (e.g. <code class="ic">~/dev/personal</code> → personal, <code class="ic">~/dev/work</code> → work).</p>
+      <div class="code-block"><pre>gid dir add ~/dev/personal --identity personal
+gid dir add . --identity work</pre></div>
+
+      <h3 id="gid-dir-remove"><code>gid dir remove &lt;path&gt;</code><a class="heading-anchor" href="#gid-dir-remove">#</a></h3>
+      <p>Removes the directory mapping for the given path. The path is resolved the same way as for <code class="ic">dir add</code> (e.g. <code class="ic">~</code> expanded). Repos under that path will no longer auto-use an identity from GiMan until you add a mapping again.</p>
+      <p>You moved a project or no longer want that folder to use a specific identity.</p>
+      <div class="code-block"><pre>gid dir remove ~/dev/work</pre></div>
+
+      <h3 id="gid-dir-list"><code>gid dir list</code><a class="heading-anchor" href="#gid-dir-list">#</a></h3>
+      <p>Lists all directory-to-identity mappings. For each identity that has directories, it prints the identity id and the paths mapped to it.</p>
+      <p>To see which folders are tied to which identity.</p>
+      <div class="code-block"><pre>gid dir list</pre></div>
+    </section>
+
+    <hr class="content-hr">
+
+    <!-- Examples -->
+    <section class="content-section" id="examples">
+      <h2>Examples</h2>
+
+      <h4>Add and use two identities</h4>
+      <div class="code-block"><pre># One-time setup
+gid init
+# Create "personal" (name, email, SSH key path)
+
+# Create "work" (name, email, SSH key path)
+gid dir add ~/dev/personal --identity personal
+gid dir add ~/dev/work --identity work
+gid apply</pre></div>
+
+      <h4>Clone with the right identity</h4>
+      <p><strong>Option 1 — use <code class="ic">gid clone</code> (prompts for profile):</strong></p>
+      <div class="code-block"><pre>gid clone git@github.com:username/my-repo.git
+# Prompts you to select an identity (personal, work, …), then clones with that identity</pre></div>
+
+      <p><strong>Option 2 — use the SSH host alias directly:</strong></p>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr><th>Identity</th><th>SSH Host Alias (used in URL)</th><th>Example Clone URL</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>personal</td><td><code>github-personal</code></td><td><code>git@github-personal:username/repo.git</code></td></tr>
+            <tr><td>work</td><td><code>github-work</code></td><td><code>git@github-work:company/repo.git</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="code-block"><pre>cd ~/dev/personal
+git clone git@github-personal:username/my-repo.git
+
+cd ~/dev/work
+git clone git@github-work:company/project.git</pre></div>
+
+      <h4>Commits and push (automatic in mapped dirs)</h4>
+      <p>Inside a mapped directory, <code class="ic">user.name</code> and <code class="ic">user.email</code> are set automatically; SSH uses the right key for push.</p>
+      <div class="code-block"><pre>cd ~/dev/work/project
+
+git config user.email
+# john@company.com
+
+git commit -m "feat: add feature"
+# Committed as: John Doe &lt;john@company.com&gt;
+
+git push origin main
+# Uses the correct SSH key</pre></div>
+
+      <h4>Fix existing repo to use an identity</h4>
+      <p>Point the remote at the identity's SSH host alias:</p>
+      <div class="code-block"><pre>cd ~/dev/personal/existing-repo
+
+git remote set-url origin git@github-personal:username/existing-repo.git
+
+git remote -v
+# origin git@github-personal:username/existing-repo.git (fetch)
+# origin git@github-personal:username/existing-repo.git (push)</pre></div>
+
+      <h4>List and inspect</h4>
+      <div class="code-block"><pre>gid id list
+
+gid id show personal
+
+gid dir list
+
+gid status</pre></div>
+    </section>
+
+    <hr class="content-hr">
+
+    <!-- Config location -->
+    <section class="content-section" id="config-location">
+      <h2>Config location</h2>
+      <ul>
+        <li><strong>GiMan config:</strong> <code class="ic">~/.giman/config.json</code> (identities, SSH key paths, directory mappings).</li>
+        <li><strong>Git:</strong> <code class="ic">~/.gitconfig</code> gets <code class="ic">includeIf</code> directives when you run <code class="ic">gid init</code>, <code class="ic">gid id add</code>, <code class="ic">gid dir add</code>, or <code class="ic">gid apply</code>.</li>
+        <li><strong>SSH:</strong> <code class="ic">~/.ssh/config</code> gets <code class="ic">Host</code> blocks for each identity (e.g. <code class="ic">github-personal</code>, <code class="ic">github-work</code>) when you run those commands (with your permission).</li>
+      </ul>
+    </section>
+
+    <hr class="content-hr">
+
+    <!-- License -->
+    <section class="content-section" id="license">
+      <h2>License</h2>
+      <p>MIT.</p>
+    </section>
+
+  </main>
+</div>
+
+<!-- ============================ FOOTER ============================ -->
+<footer class="foot">
+  <div class="foot-in">
+    <div class="foot-mark">
+      <p class="macro">GiMan<sup>®</sup></p>
+    </div>
+    <div class="foot-grid">
+      <div class="foot-cell">
+        <p class="foot-note" style="margin:0">
+          Built for developers who juggle multiple hats.<br>
+          <span class="c-red">///</span> Unit / D-01 &nbsp;·&nbsp; Rev 1.0.5 &nbsp;·&nbsp; MIT License<br>
+          &copy; <span id="year">2026</span> GiMan. All rights reserved.
+        </p>
+      </div>
+      <div class="foot-cell">
+        <p class="foot-note" style="margin:0 0 0.9rem">[ Index ]</p>
+        <div class="foot-links">
+          <a href="index.html">Home</a>
+          <a href="docs.html">Docs</a>
+          <a href="https://github.com/Lokesh-Kumar-Dudi/giman" target="_blank" rel="noopener">GitHub ↗</a>
+          <a href="https://npmjs.com/package/giman" target="_blank" rel="noopener">npm ↗</a>
+          <a href="https://github.com/Lokesh-Kumar-Dudi/giman/issues" target="_blank" rel="noopener">Issues ↗</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  /* ---------- Footer year ---------- */
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  /* ---------- Sidebar tree toggle ---------- */
+  (function () {
+    var toggles = document.querySelectorAll('.sidebar-tree-toggle');
+    toggles.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var expanded = btn.getAttribute('aria-expanded') === 'true';
+        btn.setAttribute('aria-expanded', !expanded);
+      });
+    });
+  })();
+
+  /* ---------- Sidebar active section highlighting ---------- */
+  (function () {
+    var sidebarLinks = document.querySelectorAll('.sidebar-nav a[href^="#"]');
+    var sections = [];
+    sidebarLinks.forEach(function (link) {
+      var id = link.getAttribute('href').slice(1);
+      var el = document.getElementById(id);
+      if (el) sections.push({ el: el, link: link });
+    });
+
+    if (!sections.length) return;
+
+    function update() {
+      var scrollY = window.scrollY + 120; // offset for masthead
+      var current = sections[0];
+      for (var i = 0; i < sections.length; i++) {
+        if (sections[i].el.offsetTop <= scrollY) {
+          current = sections[i];
+        }
+      }
+      sidebarLinks.forEach(function (l) { l.removeAttribute('aria-current'); });
+      current.link.setAttribute('aria-current', 'true');
+    }
+
+    window.addEventListener('scroll', update, { passive: true });
+    update();
+  })();
+
+  /* ---------- Mobile sidebar toggle ---------- */
+  (function () {
+    var sidebar = document.getElementById('sidebar');
+    var overlay = document.getElementById('sidebar-overlay');
+    var toggle = document.getElementById('sidebar-toggle');
+
+    if (!sidebar || !toggle) return;
+
+    function open() {
+      sidebar.classList.add('open');
+      if (overlay) overlay.classList.add('open');
+    }
+    function close() {
+      sidebar.classList.remove('open');
+      if (overlay) overlay.classList.remove('open');
+    }
+
+    toggle.addEventListener('click', function () {
+      sidebar.classList.contains('open') ? close() : open();
+    });
+
+    if (overlay) overlay.addEventListener('click', close);
+
+    // Close when a sidebar link is clicked (mobile)
+    sidebar.querySelectorAll('a[href^="#"]').forEach(function (a) {
+      a.addEventListener('click', function () {
+        if (window.innerWidth <= 860) close();
+      });
+    });
+  })();
+</script>
+</body>
+</html>

@@ -481,8 +481,8 @@
     <nav class="nav-idx" aria-label="Section index">
       <a class="nav-hide" href="#capabilities"><span class="nav-n">01</span> Capabilities</a>
       <a class="nav-hide" href="#how-it-works"><span class="nav-n">02</span> Mechanism</a>
-      <a href="#commands"><span class="nav-n">03</span> Commands</a>
-      <a class="nav-hide" href="#changelog"><span class="nav-n">04</span> Changelog</a>
+      <a class="nav-hide" href="#changelog"><span class="nav-n">03</span> Changelog</a>
+      <a class="nav-hide" href="#install"><span class="nav-n">04</span> Install</a>
       <a class="is-src" href="https://github.com/Lokesh-Kumar-Dudi/giman" target="_blank" rel="noopener">Source ↗</a>
     </nav>
   </div>
@@ -747,96 +747,10 @@
     </div>
   </section>
 
-  <!-- ============================ COMMANDS ============================ -->
-  <section class="sec" id="commands">
-    <div class="sec-head">
-      <span class="sec-tag">03 / Commands</span>
-      <span class="sec-rule" aria-hidden="true"></span>
-      <span class="mono c-faint">13 entries — prefix <code>gid</code></span>
-    </div>
-    <h2 class="macro macro--l">Command<br>reference</h2>
-    <p class="prose sec-lede">Every command is prefixed with <code class="ic">gid</code>.</p>
-
-    <div class="tbl-wrap">
-      <table class="cmdtbl">
-        <thead>
-          <tr><th scope="col">Idx</th><th scope="col">Command</th><th scope="col">Function</th></tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="t-i">01</td>
-            <td class="t-c">gid init</td>
-            <td class="t-d">Interactive first-time setup. Detects existing config and offers to re-apply it. Run once per machine.</td>
-          </tr>
-          <tr>
-            <td class="t-i">02</td>
-            <td class="t-c">gid status</td>
-            <td class="t-d">Show which identity is active for the current directory. No arguments needed.</td>
-          </tr>
-          <tr>
-            <td class="t-i">03</td>
-            <td class="t-c">gid apply</td>
-            <td class="t-d">Sync config to system files: rewrites <code class="ic">~/.ssh/config</code> and <code class="ic">~/.gitconfig</code>. Run after manual config edits.</td>
-          </tr>
-          <tr>
-            <td class="t-i">04</td>
-            <td class="t-c">gid clone &lt;url&gt; [dir]</td>
-            <td class="t-d">Clone a repo via SSH. Prompts to select an identity and rewrites the URL to use that identity's host alias.</td>
-          </tr>
-          <tr>
-            <td class="t-i">05</td>
-            <td class="t-c">gid id list</td>
-            <td class="t-d">List all identities with their SSH key, host alias, and mapped directories.</td>
-          </tr>
-          <tr>
-            <td class="t-i">06</td>
-            <td class="t-c">gid id add</td>
-            <td class="t-d">Add a new identity interactively — ID, name, email, SSH key, host alias.</td>
-          </tr>
-          <tr>
-            <td class="t-i">07</td>
-            <td class="t-c">gid id edit &lt;id&gt;</td>
-            <td class="t-d">Edit name, email, or SSH host alias for an identity. Run <code class="ic">gid apply</code> afterwards to sync SSH config.</td>
-          </tr>
-          <tr>
-            <td class="t-i">08</td>
-            <td class="t-c">gid id remove &lt;id&gt;</td>
-            <td class="t-d">Remove an identity, its SSH Host block, and all its gitconfig includeIf entries from <code class="ic">~/.gitconfig</code>.</td>
-          </tr>
-          <tr>
-            <td class="t-i">09</td>
-            <td class="t-c">gid id show &lt;id&gt;</td>
-            <td class="t-d">Show all details for one identity, including mapped directories.</td>
-          </tr>
-          <tr>
-            <td class="t-i">10</td>
-            <td class="t-c">gid dir add &lt;path&gt; -i &lt;id&gt;</td>
-            <td class="t-d">Map a directory to an identity. Any repo inside that path uses the identity's user and SSH key automatically.</td>
-          </tr>
-          <tr>
-            <td class="t-i">11</td>
-            <td class="t-c">gid dir remove &lt;path&gt;</td>
-            <td class="t-d">Remove a directory mapping. Git stops auto-selecting the identity for that folder.</td>
-          </tr>
-          <tr>
-            <td class="t-i">12</td>
-            <td class="t-c">gid dir list</td>
-            <td class="t-d">List all directory-to-identity mappings.</td>
-          </tr>
-          <tr>
-            <td class="t-i">13</td>
-            <td class="t-c">gid --help</td>
-            <td class="t-d">Print the full command index with flags and arguments for any subcommand.</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
   <!-- ============================ CHANGELOG ============================ -->
   <section class="sec" id="changelog">
     <div class="sec-head">
-      <span class="sec-tag">04 / Changelog</span>
+      <span class="sec-tag">03 / Changelog</span>
       <span class="sec-rule" aria-hidden="true"></span>
       <span class="mono c-faint">3 releases on record</span>
     </div>
@@ -962,9 +876,9 @@
   </section>
 
   <!-- ============================ CTA ============================ -->
-  <section class="sec" style="border-bottom:0">
+  <section class="sec" id="install" style="border-bottom:0">
     <div class="sec-head">
-      <span class="sec-tag sec-tag--red">05 / Install</span>
+      <span class="sec-tag sec-tag--red">04 / Install</span>
       <span class="sec-rule" aria-hidden="true"></span>
       <span class="mono c-faint">One command</span>
     </div>
@@ -996,7 +910,7 @@
       <div class="foot-cell">
         <p class="foot-note" style="margin:0 0 0.9rem">[ Index ]</p>
         <div class="foot-links">
-          <a href="README.md">Docs</a>
+          <a href="docs.html">Docs</a>
           <a href="https://github.com/Lokesh-Kumar-Dudi/giman" target="_blank" rel="noopener">GitHub ↗</a>
           <a href="https://npmjs.com/package/giman" target="_blank" rel="noopener">npm ↗</a>
           <a href="https://github.com/Lokesh-Kumar-Dudi/giman/issues" target="_blank" rel="noopener">Issues ↗</a>
